@@ -1,4 +1,4 @@
-@echo off
+@REM @echo off
 chcp 65001 >nul
 
 net session >nul 2>&1
