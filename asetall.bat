@@ -20,7 +20,7 @@ echo Chocolatey via WinGet...
 winget install --id chocolatey.chocolatey --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%LOG_FILE%" 2>&1
 
 echo Scoop...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-RestMethod -Uri 'https://scoop.sh' ^| Invoke-Expression" >> "%LOG_FILE%" 2>&1
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (Invoke-RestMethod -Uri 'https://scoop.sh').Invoke()" 
 
 echo.
 echo ============================================================
@@ -98,15 +98,7 @@ echo remove Bloatware...
 echo ============================================================
 echo Отключение рекламы, экрана приветствия, поиск влево и скрытие поиска...
 
-REM powershell -NoProfile -ExecutionPolicy Bypass -Command "^
-    REM $apps = @('*3dbuilder*', '*windowscommunicationsapps*', '*officehub*', '*people*', '*windowsphone*', '*bingsports*', '*bingweather*', '*xboxapp*'); ^
-    REM foreach ($app in $apps) { ^
-        REM Get-AppxPackage -AllUsers $app | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue; ^
-        REM Get-AppXProvisionedPackage -Online | Where-Object {$_.DisplayName -like $app} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue; ^
-    REM }^
-REM "
-
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$apps = @('*3dbuilder*', '*windowscommunicationsapps*', '*officehub*', '*people*', '*windowsphone*', '*bingsports*', '*bingweather*', '*xboxapp*'); foreach ($app in $apps) { Get-AppxPackage -AllUsers $app | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue; Get-AppXProvisionedPackage -Online | Where-Object {$_.DisplayName -like $app} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command '$apps = @("*3dbuilder*", "*windowscommunicationsapps*", "*officehub*", "*people*", "*windowsphone*", "*bingsports*", "*bingweather*", "*xboxapp*"); foreach ($app in $apps) { Get-AppxPackage -AllUsers $app | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue; Get-AppXProvisionedPackage -Online | Where-Object {$_.DisplayName -like $app} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue }'
 
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /v "ScoobeSystemSettingEnabled" /t REG_DWORD /d 0 /f >nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-310093Enabled" /t REG_DWORD /d 0 /f >nul
