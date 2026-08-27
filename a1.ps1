@@ -1,13 +1,13 @@
 # ==============================================================================
 # Скрипт-посредник для скачивания и запуска основного пакета
-# Вызов: irm is.gd/nemo_ps | iex
+# Вызов: irm ~~~~ | iex
 # ==============================================================================
 $ErrorActionPreference = "Stop"
-$zipUrl = "URL1" 
+$zipUrl = "https://github.com/master-nemo/ainstbat/archive/refs/heads/main.zip" 
 
-Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host "[Посредник] Проверка сетевого подключения..." -ForegroundColor Cyan
-Write-Host "============================================================" -ForegroundColor Cyan
+# Write-Host "============================================================" -ForegroundColor Cyan
+# Write-Host "[Посредник] Проверка сетевого подключения..." -ForegroundColor Cyan
+# Write-Host "============================================================" -ForegroundColor Cyan
 
 # # 1. Нативная проверка сети (до 20 секунд ожидания)
 # $online = $false
