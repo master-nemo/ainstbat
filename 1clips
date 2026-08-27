@@ -1,0 +1,230 @@
+=== note === 
+
+## scoop
+simple: irm get.scoop.sh | iex
+
+adv:
+irm get.scoop.sh -outfile 'install.ps1'
+.\install.ps1 -ScoopDir 'D:\Scoop\Apps' -ScoopGlobalDir 'D:\Scoop\GlobalScoopApps'
+
+// .\install.ps1 -?
+
+
+https://gist.githubusercontent.com/master-nemo/e68e238d40862f10ea9d04b77db57ee2/raw/1clips
+	bit.ly/ainstxt			can: imr bit.ly/ainstxt
+	https://vk.cc/cM5qDT	iwr https://vk.cc/cM5qDT -OutFile 1clip.txt
+	
+https://gist.github.com/master-nemo/e68e238d40862f10ea9d04b77db57ee2/raw/3autobase.bat
+	https://bit.ly/3autobat
+	https://vk.cc/cM5rP9
+
+https://gist.github.com/master-nemo/e68e238d40862f10ea9d04b77db57ee2/raw/2autops.ps1
+	https://bit.ly/2autops	irm bit.ly/2autops | iex
+	https://vk.cc/cM5tNv
+	
+	
+do not forget update zip link after upd! (std(_n_,@,bit-ly)
+
+PowerShell -ExecutionPolicy Bypass
+#PowerShell -ExecutionPolicy Unrestricted	(Bypass для одного запуска. Unrestricted сохраняется в системе - опасно)
+
+wget https://gist.githubusercontent.com/master-nemo/e68e238d40862f10ea9d04b77db57ee2/raw/742f397edc7504c284101f73e74f1e9aa95d5103/ichoco.bat -OutFile "ichoco.bat"
+ 
+ichoco.bat
+PowerShell -ExecutionPolicy Unrestricted -Command "wget https://gist.githubusercontent.com/master-nemo/e68e238d40862f10ea9d04b77db57ee2/raw/742f397edc7504c284101f73e74f1e9aa95d5103/ichoco.bat -OutFile ichoco.bat"
+
+all in zip	https://gist.github.com/master-nemo/e68e238d40862f10ea9d04b77db57ee2/archive/decad130279c6ea96f7089f5837a26355fe0c47a.zip
+PowerShell -ExecutionPolicy Unrestricted -Command "wget https://gist.github.com/master-nemo/e68e238d40862f10ea9d04b77db57ee2/archive/decad130279c6ea96f7089f5837a26355fe0c47a.zip -OutFile a.zip"
+
+	=uv 
+# On Windows.
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+# On macOS and Linux.
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+GIT: 
+Invoke-WebRequest -Uri https://github.com/git-for-windows/git/releases/latest/download/Git-2.40.1-64-bit.exe -OutFile git-installer.exe
+
+ == choco ==
+	=(try short )
+irm https://community.chocolatey.org/install.ps1 | iex
+powershell -Command "irm https://community.chocolatey.org/install.ps1 | iex"
+call %ProgramData%\chocolatey\bin\refreshenv
+
+	=long
+powershell -ExecutionPolicy Bypass -command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
+call %ProgramData%\chocolatey\bin\refreshenv
+
+unzip it:
+powershell.exe -nologo -noprofile -command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('a.zip', 'ichoco'); }"
+
+
+
+------ps: download
+iwr "http://www.contoso.com" -OutFile "C:\path\file"
+Invoke-WebRequest -Uri "http://www.contoso.com" -OutFile "C:\path\file"
+pseudonim= wget
+
+w10 miniTips
+
+============== WinGet install / restore
+
+$progressPreference = 'silentlyContinue'
+Write-Host "Installing WinGet PowerShell module from PSGallery..."
+Install-PackageProvider -Name NuGet -Force | Out-Null
+Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery | Out-Null
+Write-Host "Using Repair-WinGetPackageManager cmdlet to bootstrap WinGet..."
+Repair-WinGetPackageManager
+Write-Host "Done."
+
+------------ if error try
+
+$progressPreference = 'silentlyContinue'
+Write-Host "Installing WinGet PowerShell module from PSGallery..."
+Install-PackageProvider -Name NuGet -Force | Out-Null
+Install-Module -Name Microsoft.WinGet.Client -Force -Repository PSGallery | Out-Null
+Write-Host "Using Repair-WinGetPackageManager cmdlet to bootstrap WinGet..."
+Repair-WinGetPackageManager -AllUsers
+Write-Host "Done."
+
+==============================
+
+--- if gnuwin fails:
+choco install -y make wget wput gnuwin32-coreutils.install
+
+------ autologon + W10
+
+https://winitpro.ru/index.php/2015/08/21/kak-otklyuchit-vvod-parolya-pri-vxode-v-windows-10/
+netplwiz или control userpasswords2 
+„тобы отобразить пункт УUsers must enter a user name and password to use this computerФ, откройте консоль powershell.exe и внесите изменени¤ в реестр:
+
+New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\PasswordLess\Device" -Name DevicePasswordLessBuildVersion -Value 0 -Type Dword -Force
+
+Ёто значение ключа реестра отключает параметр Windows 10 У“ребовать выполнение входа с Windows Hello дл¤ учетной записи ћайкрософтФ (Require Windows Hello sign-in for Microsoft accounts). «акройте и перезапустите консоль netplwiz и убедитесь, что чекбокс по¤вилс¤.
+
+------ uninstall Cortana on Windows 10
+https://www.windowscentral.com/how-uninstall-cortana-windows-10-may-2020-update
+	PowerShell as administrator option.
+Get-AppxPackage -allusers Microsoft.549981C3F5F10 | Remove-AppxPackage
+
+------  How to remove OR restore built-in apps for Windows 10
+https://kb.rice.edu/page.php?id=73705
+
+Powershell (Admin).
+
+Type a command into PowerShell.
+For a list of all installed apps and PackageFullName enter:
+
+Get-AppxPackage | Select Name, PackageFullName
+
+Write down the PackageFullName and replace it in the following command:
+
+Get-AppxPackage PackageFullName | Remove-AppxPackage
+
+If you want to uninstall the particular pre-installed app from all user accounts, use the following command format:
+
+Get-AppxPackage -allusers PackageFullName | Remove-AppxPackage
+If you wish to remove a pre-installed app from a particular user account, use following command:
+
+Get-AppxPackage -user username PackageFullName | Remove-AppxPackage
+Specific Commands to Uninstall Apps
+Run the command to uninstall the particular pre-installed default Windows 10 Store app and restart your computer.
+
+Uninstall 3D Builder: 
+
+Get-AppxPackage *3dbuilder* | Remove-AppxPackage
+Uninstall Alarms & Clock:
+
+Get-AppxPackage *windowsalarms* | Remove-AppxPackage
+Uninstall Calculator:
+
+Get-AppxPackage *windowscalculator* | Remove-AppxPackage
+Uninstall Camera:
+
+Get-AppxPackage *windowscamera* | Remove-AppxPackage
+Uninstall Calendar & Mail:
+
+Get-AppxPackage *windowscommunicationsapps* | Remove-AppxPackage
+Uninstall Get Office app:
+
+Get-AppxPackage *officehub* | Remove-AppxPackage
+Uninstall Get Started app:
+
+Get-AppxPackage *getstarted* | Remove-AppxPackage
+Uninstall Solitaire Collection:
+
+Get-AppxPackage *solit* | Remove-AppxPackage
+Uninstall Get Skype app:
+
+Get-AppxPackage *skypeapp* | Remove-AppxPackage
+Uninstall Groove Music:
+
+Get-AppxPackage *zunemusic* | Remove-AppxPackage
+Uninstall Microsoft Solitaire Collection:
+
+Get-AppxPackage *solitairecollection* | Remove-AppxPackage
+Uninstall Maps:
+
+Get-AppxPackage *windowsmaps* | Remove-AppxPackage
+Uninstall Money:
+
+Get-AppxPackage *bingfinance* | Remove-AppxPackage
+Uninstall Movies & TV:
+
+Get-AppxPackage *zunevideo* | Remove-AppxPackage
+Uninstall OneNote:
+
+Get-AppxPackage *onenote* | Remove-AppxPackage
+Uninstall News:
+
+Get-AppxPackage *bingnews* | Remove-AppxPackage
+Uninstall People app:
+
+Get-AppxPackage *people* | Remove-AppxPackage
+Uninstall Phone Companion:
+
+Get-AppxPackage *windowsphone* | Remove-AppxPackage
+Uninstall Photos:
+
+Get-AppxPackage *photos* | Remove-AppxPackage
+Uninstall Store:
+
+Get-AppxPackage *windowsstore* | Remove-AppxPackage
+Uninstall Sports:
+
+Get-AppxPackage *bingsports* | Remove-AppxPackage
+Uninstall Voice Recorder:
+
+Get-AppxPackage *soundrecorder* | Remove-AppxPackage
+Uninstall Weather:
+
+Get-AppxPackage *bingweather* | Remove-AppxPackage
+Uninstall Xbox:
+
+Get-AppxPackage *xboxapp* | Remove-AppxPackage
+Uninstalling for New Users
+Even though youТve uninstalled all the apps for all the users, every time you create a new user, the default apps will be reinstalled for that user. You can prevent this default action by executing the following command in the Powershell.
+
+Get-AppXProvisionedPackage -online | Remove-AppxProvisionedPackage -online
+How to Restore Built-In Apps on Windows 10
+Right-click the Start button.
+Click Windows Powershell (Admin).
+Type "Get-AppxPackage -AllUsers | For each app: Add-AppxPackage -DisableDevelopmentMode -Register "$($_InstallLocation)\AppXManifest.xml"
+Hit Enter. This command tells Windows to install those default apps again. Give it some time and allow it to finish, even if nothing appears to happen at first. Even if you see an error message, restart your PC.
+You should now be able to find all the built-in apps in Windows 10.ItТs also likely that future updates (especially major updates) could reinstall those apps.
+
+
+
+
+------ restore windowsstore
+https://winitpro.ru/index.php/2015/08/05/vosstanovlenie-windows-store-v-windows-10/
+
+
+------ 
+------ 
+------ 
+------ 
+------ 
+------ 
+------ 
+------ 

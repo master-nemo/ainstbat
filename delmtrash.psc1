@@ -1,0 +1,21 @@
+Get-AppxPackage -allusers Microsoft.549981C3F5F10 | Remove-AppxPackage
+
+Get-AppxPackage *3dbuilder* | Remove-AppxPackage
+Get-AppxPackage *windowscommunicationsapps* | Remove-AppxPackage
+Get-AppxPackage *officehub* | Remove-AppxPackage
+Get-AppxPackage *people* | Remove-AppxPackage
+
+
+Get-AppxPackage *windowsphone* | Remove-AppxPackage
+#@rem Get-AppxPackage *photos* | Remove-AppxPackage
+#@rem Get-AppxPackage *windowsstore* | Remove-AppxPackage
+Get-AppxPackage *bingsports* | Remove-AppxPackage
+#@rem Get-AppxPackage *soundrecorder* | Remove-AppxPackage
+Get-AppxPackage *bingweather* | Remove-AppxPackage
+Get-AppxPackage *xboxapp* | Remove-AppxPackage
+
+# Uninstalling for New Users
+#Even though youТve uninstalled all the apps for all the users, every time you create a new user, the default apps will be reinstalled for that user. You can prevent this default action by executing the following command in the Powershell.
+
+Get-AppXProvisionedPackage -online | Remove-AppxProvisionedPackage -online
+

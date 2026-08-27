@@ -1,0 +1,321 @@
+remove-gamebar-powershell-win10.md by joshschmelzle.txt
+
+https://gist.github.com/joshschmelzle/04c57d957c5bb92e85ae9180021b26dc
+You've probably stumbled upon this researching how to remove the Xbox Game Bar. This gist includes a few different methods you can try. Please note that some of these first options are probably not be available unless you are running an older version of Windows 10.
+
+# Uninstalling/Removing the Game Bar (old Windows 10 build GUI options)
+
+_(this is no longer an option on any recent Windows 10 build)_
+
+1. Press Windows Key or click on the Start menu.
+2. Start typing `Xbox` or `Game Bar`, until you get the Xbox Game Bar app to appear in the results.
+3. Right-click on the app and pick `Uninstall`. Answer `Yes` to the prompt, and wait for the process to finish.
+
+## Windows Build 19H1 (uninstall moved into Settings)
+
+You might not have an `Uninstall` option in the right-click context menu. Try drilling into `Settings` and looking there.
+
+1. Press Windows Key or click on the Start menu.
+2. Start typing `Xbox` or `Game Bar`, until you get the Xbox Game Bar app.
+3. Right click on `Xbox Game Bar` and click `Settings`
+4. Scroll down and click `Uninstall`. Wait for the process to finish.
+
+## Windows Build 19H1/19H2 (uninstall button is now grayed out)
+
+On my machine running Windows Build 10.0.18362 the uninstall button is grayed out. The button I'm referring to is here: `Xbox Game Bar > Right Click > App Settings > Uninstall.` 
+
+# Game Bar Settings
+
+Depending on why you're trying to remove the Game bar, you might also try changing the Game bar settings. 
+
+Go to `Search > "game bar settings"`.
+
+1. For the option that says `Record game clips, screenshots, and broadcasting using Game Bar` move the slider to the `Off` position. This should stop the default `Win+G` shortcut from opening the Game bar. 
+
+2. If you need `Win+G` for a different application (I ran into this), you should be able to change the shortcut, and you're done! Go to `Search > "game bar settings" > Game bar > Keyboard shortcuts`. I verified this on my Surface Pro 1903/19H1/18362.
+
+# Removing Microsoft.Xbox* AppXPackage using PowerShell and DISM (short version)
+
+Can't find a way to uninstall the Game Bar using the GUI? The DISM tool and PowerShell might do the trick. 
+
+DISM is a **D**eployment **I**mage **S**ervicing and **M**anagement tool. You can use DISM from an elevated (admin) PowerShell prompt. 
+
+### 1. Open Windows PowerShell as an administrator (_Windows Key > Start typing "PowerShell" > CTRL + SHIFT + ENTER_)
+
+### 2. First run `dism /Online /Get-ProvisionedAppxPackages | Select-String PackageName | Select-String xbox` to see what xbox packages are actually on your system.
+
+```
+ dism /Online /Get-ProvisionedAppxPackages | Select-String PackageName | Select-String xbox
+```
+
+You can try to run the following command which will get the AppXPackages matching on `xbox` and attempt to remove them. There are several commands stringed together (thanks @bashenk for your help on this).
+
+You can try this through DISM, or PowerShell. Either one should do the trick, pick one.
+
+### 3a. DISM version:
+
+```
+dism /Online /Get-ProvisionedAppxPackages | `
+Select-String PackageName | `
+Select-String xbox | `
+ForEach-Object {$_.Line.Split(':')[1].Trim()} | `
+ForEach-Object { dism /Online /Remove-ProvisionedAppxPackage /PackageName:$_}
+```
+
+### 3b. PowerShell cmdlet version:
+
+```
+Get-ProvisionedAppxPackage -Online | `
+Where-Object { $_.PackageName -match "xbox" } | `
+ForEach-Object { Remove-ProvisionedAppxPackage -Online -PackageName $_.PackageName }
+```
+
+If you want to remove packages for other users, you will need to pass in the `-allusers` parameter like so:
+
+```
+Get-ProvisionedAppxPackage -Online | `
+Where-Object { $_.PackageName -match "xbox" } | `
+ForEach-Object { Remove-ProvisionedAppxPackage -Online -AllUsers -PackageName $_.PackageName }
+```
+
+### 4. Verify
+
+Ok - let's see if the xbox packages are still there. Search for the xbox packages again. If there are no results, the respective appxpackages were removed.
+
+```
+dism /Online /Get-ProvisionedAppxPackages | Select-String PackageName | Select-String xbox
+```
+
+You may need to reboot after.
+
+# Struggling removing certain Xbox packages like the XboxGamingOverlay?
+
+@Svenster64 commented that they had issues on build 1909 removing the XboxGamingOverlay. Here is the PowerShell command that helped them:
+
+```
+Get-AppxPackage -AllUsers Microsoft.XboxGamingOverlay | Remove-AppxPackage
+```
+
+# Removing Microsoft.Xbox* AppXPackage using PowerShell and DISM (long and manual version)
+
+This section expands on the short versions. It goes through separate commands instead of stringing commands together. Read this if you're interested in what all the commands do. 
+
+## Step 1. Remove AppxPackages from current user.
+
+Open PowerShell as your current user (not as an administrator).
+
+Identify user by running `$env:Username`:
+
+```
+PS C:\Users\josh> $env:Username
+josh
+```
+
+Get list of xbox AppxPackages using `Get-AppxPackage`:
+
+```
+PS C:\Users\josh>  Get-AppxPackage | select-string xbox
+
+Microsoft.Xbox.TCUI_1.24.10001.0_x64__8wekyb3d8bbwe
+Microsoft.XboxSpeechToTextOverlay_1.21.13002.0_x64__8wekyb3d8bbwe
+Microsoft.XboxGameCallableUI_1000.18362.449.0_neutral_neutral_cw5n1h2txyewy
+Microsoft.XboxGameOverlay_1.47.14001.0_x64__8wekyb3d8bbwe
+Microsoft.XboxGamingOverlay_3.34.15002.0_x64__8wekyb3d8bbwe
+Microsoft.XboxIdentityProvider_12.58.1001.0_x64__8wekyb3d8bbwe
+```
+
+## Step 2. Build your remove script using package names discovered in Step 1.
+
+Which might look something like this:
+
+```
+Remove-AppxPackage Microsoft.Xbox.TCUI_1.24.10001.0_x64__8wekyb3d8bbwe
+Remove-AppxPackage Microsoft.XboxSpeechToTextOverlay_1.21.13002.0_x64__8wekyb3d8bbwe
+Remove-AppxPackage Microsoft.XboxGameCallableUI_1000.18362.449.0_neutral_neutral_cw5n1h2txyewy
+Remove-AppxPackage Microsoft.XboxGameOverlay_1.47.14001.0_x64__8wekyb3d8bbwe
+Remove-AppxPackage Microsoft.XboxGamingOverlay_3.34.15002.0_x64__8wekyb3d8bbwe
+Remove-AppxPackage Microsoft.XboxIdentityProvider_12.58.1001.0_x64__8wekyb3d8bbwe
+```
+
+Run:
+
+```
+PS C:\Users\josh> Remove-AppxPackage Microsoft.Xbox.TCUI_1.24.10001.0_x64__8wekyb3d8bbwe
+PS C:\Users\josh> Remove-AppxPackage Microsoft.XboxSpeechToTextOverlay_1.21.13002.0_x64__8wekyb3d8bbwe
+PS C:\Users\josh> Remove-AppxPackage Microsoft.XboxGameCallableUI_1000.18362.449.0_neutral_neutral_cw5n1h2txyewy
+Remove-AppxPackage : Deployment failed with HRESULT: 0x80073CFA, Removal failed. Please contact your software vendor.
+(Exception from HRESULT: 0x80073CFA)
+error 0x80070032: AppX Deployment Remove operation on package
+Microsoft.XboxGameCallableUI_1000.18362.449.0_neutral_neutral_cw5n1h2txyewy from:
+C:\WINDOWS\SystemApps\Microsoft.XboxGameCallableUI_cw5n1h2txyewy failed. This app is part of Windows and cannot be
+uninstalled on a per-user basis. An administrator can attempt to remove the app from the computer using Turn Windows
+Features on or off. However, it may not be possible to uninstall the app.
+NOTE: For additional information, look for [ActivityId] 1e9e759c-9d2e-0000-74d3-a31e2e9dd501 in the Event Log or use
+the command line Get-AppPackageLog -ActivityID 1e9e759c-9d2e-0000-74d3-a31e2e9dd501
+At line:1 char:1
++ Remove-AppxPackage Microsoft.XboxGameCallableUI_1000.18362.449.0_neut ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : WriteError: (Microsoft.XboxG...l_cw5n1h2txyewy:String) [Remove-AppxPackage], IOException
+    + FullyQualifiedErrorId : DeploymentError,Microsoft.Windows.Appx.PackageManager.Commands.RemoveAppxPackageCommand
+
+PS C:\Users\josh> Remove-AppxPackage Microsoft.XboxGameOverlay_1.47.14001.0_x64__8wekyb3d8bbwe
+PS C:\Users\josh> Remove-AppxPackage Microsoft.XboxGamingOverlay_3.34.15002.0_x64__8wekyb3d8bbwe
+PS C:\Users\josh> Remove-AppxPackage Microsoft.XboxIdentityProvider_12.58.1001.0_x64__8wekyb3d8bbwe
+```
+
+You may notice one or more attempts to remove a package failed. We can clean that up using PowerShell as an administrator.
+
+If your administrator account is a different account, you may need to use the `-AllUsers` parameter with certain commands.  
+
+## Step 3. Check AppxPackage list again
+
+```
+PS C:\Users\josh> Get-AppxPackage | select-string xbox
+
+Microsoft.XboxGameCallableUI_1000.18362.449.0_neutral_neutral_cw5n1h2txyewy
+```
+
+## Step 4. Launch PowerShell as an administrator
+
+Now that we have an elevated command prompt. Let's look at the AppxPackage list again. We may see a few more:
+
+```
+PS C:\WINDOWS\system32> Get-AppxPackage | Select-String xbox
+
+Microsoft.XboxGameCallableUI_1000.15063.0.0_neutral_neutral_cw5n1h2txyewy
+Microsoft.XboxSpeechToTextOverlay_1.21.13002.0_x64__8wekyb3d8bbwe
+Microsoft.XboxGameOverlay_1.47.14001.0_x64__8wekyb3d8bbwe
+Microsoft.XboxIdentityProvider_12.58.1001.0_x64__8wekyb3d8bbwe
+```
+
+Note: if you want to remove for multiple users, you need to run with the `-AllUsers` parameter: `Get-AppxPackage -AllUsers`.
+
+Let's remove them:
+
+```
+Remove-AppxPackage Microsoft.XboxGameCallableUI_1000.15063.0.0_neutral_neutral_cw5n1h2txyewy
+Remove-AppxPackage Microsoft.XboxSpeechToTextOverlay_1.21.13002.0_x64__8wekyb3d8bbwe
+Remove-AppxPackage Microsoft.XboxGameOverlay_1.47.14001.0_x64__8wekyb3d8bbwe
+Remove-AppxPackage Microsoft.XboxIdentityProvider_12.58.1001.0_x64__8wekyb3d8bbwe
+```
+
+Results:
+
+```
+PS C:\WINDOWS\system32> Remove-AppxPackage Microsoft.XboxGameCallableUI_1000.15063.0.0_neutral_neutral_cw5n1h2txyewy
+Remove-AppxPackage : Deployment failed with HRESULT: 0x80073D19, An error occurred because a user was logged off.
+error 0x80070032: AppX Deployment Remove operation on package
+Microsoft.XboxGameCallableUI_1000.15063.0.0_neutral_neutral_cw5n1h2txyewy from:
+C:\Windows\SystemApps\Microsoft.XboxGameCallableUI_cw5n1h2txyewy failed. This app is part of Windows and cannot be
+uninstalled on a per-user basis. An administrator can attempt to remove the app from the computer using Turn Windows
+Features on or off. However, it may not be possible to uninstall the app.
+NOTE: For additional information, look for [ActivityId] 1e9e759c-9d2e-0001-5455-a21e2e9dd501 in the Event Log or use
+the command line Get-AppPackageLog -ActivityID 1e9e759c-9d2e-0001-5455-a21e2e9dd501
+At line:1 char:1
++ Remove-AppxPackage Microsoft.XboxGameCallableUI_1000.15063.0.0_neutra ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Microsoft.XboxG...l_cw5n1h2txyewy:String) [Remove-AppxPackage], Exception
+    + FullyQualifiedErrorId : DeploymentError,Microsoft.Windows.Appx.PackageManager.Commands.RemoveAppxPackageCommand
+
+PS C:\WINDOWS\system32> Remove-AppxPackage Microsoft.XboxSpeechToTextOverlay_1.21.13002.0_x64__8wekyb3d8bbwe
+PS C:\WINDOWS\system32> Remove-AppxPackage Microsoft.XboxGameOverlay_1.47.14001.0_x64__8wekyb3d8bbwe
+PS C:\WINDOWS\system32> Remove-AppxPackage Microsoft.XboxIdentityProvider_12.58.1001.0_x64__8wekyb3d8bbwe
+```
+
+We see one failed. Let's try to use DISM to remove them.
+
+## Step 5: Get a list of DISM packages that match on xbox
+
+Search provisioned packages, you might see more packages than what you found via the Remove-AppxPackage cmdlet. 
+
+```
+PS C:\WINDOWS\system32> dism /online /get-provisionedappxpackages | select-string packagename | select-string xbox | ForEach-Object {$_.Line.Split(':')[1]}
+ Microsoft.XboxGameOverlay_1.47.14001.0_neutral_~_8wekyb3d8bbwe
+ Microsoft.XboxGamingOverlay_3.34.15002.0_neutral_~_8wekyb3d8bbwe
+ Microsoft.XboxIdentityProvider_12.58.1001.0_neutral_~_8wekyb3d8bbwe
+ Microsoft.XboxSpeechToTextOverlay_1.21.13002.0_neutral_~_8wekyb3d8bbwe
+```
+
+## Step 6: Remove the DISM packages that match on xbox
+
+Build your script based on output found in step 5.
+
+```
+dism /online /remove-provisionedappxpackage /packagename:Microsoft.XboxGameOverlay_1.47.14001.0_neutral_~_8wekyb3d8bbwe
+dism /online /remove-provisionedappxpackage /packagename:Microsoft.XboxGamingOverlay_3.34.15002.0_neutral_~_8wekyb3d8bbwe
+dism /online /remove-provisionedappxpackage /packagename:Microsoft.XboxIdentityProvider_12.58.1001.0_neutral_~_8wekyb3d8bbwe
+dism /online /remove-provisionedappxpackage /packagename:Microsoft.XboxSpeechToTextOverlay_1.21.13002.0_neutral_~_8wekyb3d8bbwe
+```
+
+Example Result:
+
+```
+PS C:\WINDOWS\system32> dism /online /remove-provisionedappxpackage /packagename:Microsoft.XboxGameOverlay_1.47.14001.0_neutral_~_8wekyb3d8bbwe
+
+Deployment Image Servicing and Management tool
+Version: 10.0.18362.1
+
+Image Version: 10.0.18362.476
+
+The operation completed successfully.
+PS C:\WINDOWS\system32> dism /online /remove-provisionedappxpackage /packagename:Microsoft.XboxGamingOverlay_3.34.15002.0_neutral_~_8wekyb3d8bbwe
+
+Deployment Image Servicing and Management tool
+Version: 10.0.18362.1
+
+Image Version: 10.0.18362.476
+
+The operation completed successfully.
+PS C:\WINDOWS\system32> dism /online /remove-provisionedappxpackage /packagename:Microsoft.XboxIdentityProvider_12.58.1001.0_neutral_~_8wekyb3d8bbwe
+
+Deployment Image Servicing and Management tool
+Version: 10.0.18362.1
+
+Image Version: 10.0.18362.476
+
+The operation completed successfully.
+PS C:\WINDOWS\system32> dism /online /remove-provisionedappxpackage /packagename:Microsoft.XboxSpeechToTextOverlay_1.21.13002.0_neutral_~_8wekyb3d8bbwe
+
+Deployment Image Servicing and Management tool
+Version: 10.0.18362.1
+
+Image Version: 10.0.18362.476
+
+The operation completed successfully.
+```
+
+## Step 7. Verify
+
+Run DISM as an administrator:
+
+```
+PS C:\WINDOWS\system32>  dism /online /get-provisionedappxpackages | select-string packagename | select-string xbox
+PS C:\WINDOWS\system32>
+```
+
+Run AppXPackage as a normal user:
+
+```
+PS C:\Users\josh> Get-AppxPackage | select-string xbox
+
+Microsoft.XboxGameCallableUI_1000.18362.449.0_neutral_neutral_cw5n1h2txyewy
+```
+
+Run AppXPackage as an elevated user:
+
+```
+PS C:\WINDOWS\system32> Get-AppxPackage | Select-String xbox
+
+Microsoft.XboxGameCallableUI_1000.15063.0.0_neutral_neutral_cw5n1h2txyewy
+```
+
+In this example, I had difficulty removing the XboxGameCallableUI package.
+
+# Appendix
+
+Did something different to remove the Game bar?  Please comment and let us know (except via apps like CCleaner). 
+
+I'll try to keep this gist updated to help other folks stumbling onto this gist.
+
+Cheers!
+
