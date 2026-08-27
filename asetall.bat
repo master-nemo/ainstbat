@@ -1,4 +1,4 @@
-REM @echo off
+@echo off
 chcp 65001 >nul
 
 @rem 1. ПРОВЕРКА ПРАВ АДМИНИСТРАТОРА
@@ -173,13 +173,12 @@ set "UV_DIR=C:\Program Files\uv"
 if not exist "%UV_DIR%" mkdir "%UV_DIR%"
 
 @rem Скачивание и установка uv в общую папку
-REM powershell -NoProfile -ExecutionPolicy Bypass -Command "$env:UV_INSTALL_DIR='%UV_DIR%'; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://astral.sh/uv/install.ps1 | iex"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$env:UV_INSTALL_DIR='%UV_DIR%'; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm 'https://astral.sh' ^| iex"
-
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$env:UV_INSTALL_DIR='C:\Program Files\uv'; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-RestMethod -Uri 'https://astral.sh' | Invoke-Expression"
 
 @rem Добавление папки uv в системный PATH (если её там еще нет)
-set "PATH_TO_ADD=%UV_DIR%"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$sysPath = [Environment]::GetEnvironmentVariable('Path', 'Machine'); if ($sysPath -notlike '*%PATH_TO_ADD%*') { [Environment]::SetEnvironmentVariable('Path', $sysPath + ';%PATH_TO_ADD%', 'Machine') }"
+REM set "PATH_TO_ADD=%UV_DIR%"
+REM powershell -NoProfile -ExecutionPolicy Bypass -Command "$sysPath = [Environment]::GetEnvironmentVariable('Path', 'Machine'); if ($sysPath -notlike '*%PATH_TO_ADD%*') { [Environment]::SetEnvironmentVariable('Path', $sysPath + ';%PATH_TO_ADD%', 'Machine') }"
+powershell -NoProfile -Command "$sysPath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine'); if ($sysPath -notlike '*C:\Program Files\uv*') { [System.Environment]::SetEnvironmentVariable('Path', $sysPath + ';C:\Program Files\uv', 'Machine') }"
 
 @rem Обновляем PATH в текущей сессии батника
 set "PATH=%PATH%;%UV_DIR%"
