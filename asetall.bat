@@ -1,4 +1,4 @@
-@echo off
+REM @echo off
 chcp 65001 >nul
 
 @rem 1. ПРОВЕРКА ПРАВ АДМИНИСТРАТОРА
