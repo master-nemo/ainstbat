@@ -1,6 +1,7 @@
 # ==============================================================================
 # Скрипт-посредник для скачивания и запуска основного пакета
-# Вызов: irm ~~~~ | iex
+# Вызов: irm https://raw.githubusercontent.com/master-nemo/ainstbat/refs/heads/main/a1.ps1 | iex
+# Вызов: irm clck.ru/3VTU4Q | iex
 # ==============================================================================
 $ErrorActionPreference = "Stop"
 $zipUrl = "https://github.com/master-nemo/ainstbat/archive/refs/heads/main.zip" 
