@@ -108,13 +108,16 @@ echo ============================================================
 echo Отключение рекламы, экрана приветствия, поиск влево и скрытие поиска...
 
 @rem Запуск оптимизированного PowerShell-блока (Edge не трогаем, OneDrive удаляется)
-powershell -NoProfile -ExecutionPolicy Bypass -Command "^
-    $apps = @('*3dbuilder*', '*windowscommunicationsapps*', '*officehub*', '*people*', '*windowsphone*', '*bingsports*', '*bingweather*', '*xboxapp*'); ^
-    foreach ($app in $apps) { ^
-        Get-AppxPackage -AllUsers $app | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue; ^
-        Get-AppXProvisionedPackage -Online | Where-Object {$_.DisplayName -like $app} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue; ^
-    }^
-"
+REM powershell -NoProfile -ExecutionPolicy Bypass -Command "^
+    REM $apps = @('*3dbuilder*', '*windowscommunicationsapps*', '*officehub*', '*people*', '*windowsphone*', '*bingsports*', '*bingweather*', '*xboxapp*'); ^
+    REM foreach ($app in $apps) { ^
+        REM Get-AppxPackage -AllUsers $app | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue; ^
+        REM Get-AppXProvisionedPackage -Online | Where-Object {$_.DisplayName -like $app} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue; ^
+    REM }^
+REM "
+
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$apps = @('*3dbuilder*', '*windowscommunicationsapps*', '*officehub*', '*people*', '*windowsphone*', '*bingsports*', '*bingweather*', '*xboxapp*'); foreach ($app in $apps) { Get-AppxPackage -AllUsers $app | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue; Get-AppXProvisionedPackage -Online | Where-Object {$_.DisplayName -like $app} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue }"
+
 
 @rem 1. Отключение экрана приветствия «Давайте познакомимся с настройками...» и запрет передачи персональных данных
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /v "ScoobeSystemSettingEnabled" /t REG_DWORD /d 0 /f >nul
@@ -167,7 +170,7 @@ echo + uv py
 echo ============================================================
 echo ============================================================
 
-@echo off
+
 setlocal enabledelayedexpansion
 
 @rem 3. ГЛОБАЛЬНАЯ УСТАНОВКА UV ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ
