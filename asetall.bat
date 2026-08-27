@@ -15,11 +15,17 @@ echo ============================================================
 echo [1/6] Chocolatey and Scoop
 echo ============================================================
 
-echo Chocolatey via WinGet...
-winget install --id chocolatey.chocolatey --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%LOG_FILE%" 2>&1
+where winget >nul 2>nul
+if %errorLevel% == 0 (
+    echo Installing Chocolatey via WinGet...
+    winget install --id chocolatey.chocolatey --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%LOG_FILE%" 2>&1
+) else (
+    echo [!] WinGet not found. Installing Chocolatey natively via PowerShell...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org'))" >> "%LOG_FILE%" 2>&1
+)
 
-echo Scoop...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (Invoke-RestMethod -Uri 'https://scoop.sh').Invoke()" >> "%LOG_FILE%" 2>&1
+echo Installing Scoop...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$code = [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-RestMethod -Uri 'https://scoop.sh'; Invoke-Expression $code" >> "%LOG_FILE%" 2>&1
 
 echo.
 echo ============================================================
@@ -31,8 +37,10 @@ if exist "%ProgramData%\chocolatey\bin\refreshenv.cmd" (call "%ProgramData%\choc
 where choco.exe >nul 2>nul
 if errorlevel 1 (
     echo [!] No choco in session. Setting path via PowerShell...
-    powershell -NoProfile -Command "$oldPath=[System.Environment]::GetEnvironmentVariable('Path','Machine'); if($oldPath -notlike '*chocolatey\bin*'){$( [System.Environment]::SetEnvironmentVariable('Path',$oldPath+';C:\ProgramData\chocolatey\bin','Machine') )}"
-    if exist "%ProgramData%\chocolatey\bin\refreshenv.cmd" call "%ProgramData%\chocolatey\bin\refreshenv.cmd"
+    powershell -NoProfile -Command "$oldPath=[System.Environment]::GetEnvironmentVariable('Path','Machine'); if($oldPath -notlike '*chocolatey\bin*'){ [System.Environment]::SetEnvironmentVariable('Path',$oldPath+';C:\ProgramData\chocolatey\bin','Machine') }"
+    
+    @rem Принудительно добавляем в текущую сессию батника на случай сбоя refreshenv
+    set "PATH=%PATH%;C:\ProgramData\chocolatey\bin"
 ) else (
     echo [OK] Chocolatey environment initialized.
 )
@@ -47,24 +55,32 @@ set "APPS_1=adobereader googlechrome far 7zip.install gnuwin notepadplusplus con
 set "APPS_2=opera git tortoisegit stduviewer clipdiary libreoffice-fresh pdfcreator"
 set "APPS_3=choco-cleaner vlc k-litecodecpackbasic fsviewer doublecmd"
 
-choco install -y %APPS_1%
-if errorlevel 1 echo [WARN] Group 1 install error >> "%LOG_FILE%"
+where choco.exe >nul 2>nul
+if %errorLevel% == 0 (
+    choco install -y %APPS_1%
+    if errorlevel 1 echo [WARN] Group 1 install error >> "%LOG_FILE%"
 
-choco install -y %APPS_2%
-if errorlevel 1 echo [WARN] Group 2 install error >> "%LOG_FILE%"
+    choco install -y %APPS_2%
+    if errorlevel 1 echo [WARN] Group 2 install error >> "%LOG_FILE%"
 
-choco install -y %APPS_3%
-if errorlevel 1 echo [WARN] Group 3 install error >> "%LOG_FILE%"
+    choco install -y %APPS_3%
+    if errorlevel 1 echo [WARN] Group 3 install error >> "%LOG_FILE%"
+) else (
+    echo [!] Package manager choco.exe still unavailable. Skipping apps install. >> "%LOG_FILE%"
+)
 
 echo.
 echo ============================================================
 echo [4/6] Install via WinGet
 echo ============================================================
 
-if exist "%ProgramData%\chocolatey\bin\refreshenv.cmd" call "%ProgramData%\chocolatey\bin\refreshenv.cmd"
-
-winget install --id marlocarlo.pstop --silent --accept-source-agreements --accept-package-agreements >> "%LOG_FILE%" 2>&1
-winget install --id psmux.psnet --silent --accept-source-agreements --accept-package-agreements >> "%LOG_FILE%" 2>&1
+where winget >nul 2>nul
+if %errorLevel% == 0 (
+    winget install --id marlocarlo.pstop --silent --accept-source-agreements --accept-package-agreements >> "%LOG_FILE%" 2>&1
+    winget install --id psmux.psnet --silent --accept-source-agreements --accept-package-agreements >> "%LOG_FILE%" 2>&1
+) else (
+    echo [!] WinGet missing. Skipping pstop and psnet install. >> "%LOG_FILE%"
+)
 
 echo.
 echo ============================================================
@@ -72,7 +88,8 @@ echo [5/6] Remove Bloatware and Tweaks
 echo ============================================================
 echo Cleaning system...
 
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$apps=@('*3dbuilder*','*windowscommunicationsapps*','*officehub*','*people*','*windowsphone*','*bingsports*','*bingweather*','*xboxapp*'); foreach($app in $apps){Get-AppxPackage -AllUsers $app | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue; Get-AppXProvisionedPackage -Online | Where-Object {$_.DisplayName -like $app} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue}"
+@REM powershell -NoProfile -ExecutionPolicy Bypass -Command "$apps=@('*3dbuilder*','*windowscommunicationsapps*','*officehub*','*people*','*windowsphone*','*bingsports*','*bingweather*','*xboxapp*'); foreach($app in $apps){Get-AppxPackage -AllUsers $app -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue 2>$null; Get-AppXProvisionedPackage -Online | Where-Object {$_.DisplayName -like $app} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue 2>$null}"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$apps=@('*3dbuilder*','*windowscommunicationsapps*','*officehub*','*people*','*windowsphone*','*bingsports*','*bingweather*','*xboxapp*'); foreach($app in $apps){Get-AppxPackage -AllUsers $app -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue 2>$null; Get-AppXProvisionedPackage -Online | Where-Object {$_.DisplayName -like $app} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue }"
 
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /v "ScoobeSystemSettingEnabled" /t REG_DWORD /d 0 /f >nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-310093Enabled" /t REG_DWORD /d 0 /f >nul
@@ -105,21 +122,35 @@ echo ============================================================
 set "UV_DIR=C:\Program Files\uv"
 if not exist "%UV_DIR%" mkdir "%UV_DIR%"
 
-echo Installing official Python Launcher (py.exe) via WinGet...
-winget install --id Python.Launcher --silent --accept-source-agreements --accept-package-agreements >> "%LOG_FILE%" 2>&1
+where winget >nul 2>nul
+if %errorLevel% == 0 (
+    echo Installing official Python Launcher (py.exe) via WinGet...
+    winget install --id Python.Launcher --silent --accept-source-agreements --accept-package-agreements >> "%LOG_FILE%" 2>&1
+) else (
+    echo [!] WinGet missing. Downloading Python Launcher setup directly...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri 'https://python.org' -OutFile '$env:TEMP\py_setup.exe'"
+    echo Installing Python Launcher...
+    if exist "%TEMP%\py_setup.exe" start "" /wait "%TEMP%\py_setup.exe" /quiet InstallLauncherAllUsers=1 PrependPath=1 Include_test=0 Include_pip=0 Include_doc=0 Include_dev=0 Include_exe=0 Include_lib=0
+)
 
 echo Installing global UV for all users...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$env:UV_INSTALL_DIR='C:\Program Files\uv'; [Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12; (Invoke-RestMethod -Uri 'https://astral.sh').Invoke()" >> "%LOG_FILE%" 2>&1
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$env:UV_INSTALL_DIR='C:\Program Files\uv'; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $script = Invoke-RestMethod -Uri 'https://astral.sh'; Invoke-Expression $script" >> "%LOG_FILE%" 2>&1
 
 echo Registering UV in System PATH...
-powershell -NoProfile -Command "$sysPath=[System.Environment]::GetEnvironmentVariable('Path','Machine'); if($sysPath -notlike '*C:\Program Files\uv*'){$([System.Environment]::SetEnvironmentVariable('Path',$sysPath+';C:\Program Files\uv','Machine'))}"
+powershell -NoProfile -Command "$sysPath=[System.Environment]::GetEnvironmentVariable('Path','Machine'); if($sysPath -notlike '*C:\Program Files\uv*'){ [System.Environment]::SetEnvironmentVariable('Path',$sysPath+';C:\Program Files\uv','Machine') }"
 
 set "PATH=%PATH%;%UV_DIR%"
 
 echo Installing latest Python 3.9.* via UV...
 set "UV_PYTHON_INSTALL_DIR=C:\ProgramData\uv\python"
 if not exist "%UV_PYTHON_INSTALL_DIR%" mkdir "%UV_PYTHON_INSTALL_DIR%"
-"%UV_DIR%\uv.exe" python install 3.9
+
+if exist "%UV_DIR%\uv.exe" (
+    "%UV_DIR%\uv.exe" python install 3.9
+) else (
+    echo [!] Error: uv.exe was not installed properly. >> "%LOG_FILE%"
+    goto :end
+)
 
 echo Registering UV Python in HKLM for py.exe launcher...
 set "PY_EXE_PATH="
@@ -142,12 +173,16 @@ reg add "HKLM\SOFTWARE\Python\PythonCore\3.9\InstallPath" /t REG_SZ /d "%PY_DIR_
 reg add "HKLM\SOFTWARE\Python\PythonCore\3.9\InstallPath" /v "ExecutablePath" /t REG_SZ /d "%PY_EXE_PATH%" /f >nul
 
 echo [+] Verification of py.exe launcher:
-py -3.9 --version
+where py >nul 2>nul
+if %errorLevel% == 0 (
+    py -3.9 --version
+) else (
+    echo [!] py.exe launcher path is not refreshed yet. Testing direct executable:
+    "%PY_EXE_PATH%" --version
+)
 
 :end
 echo.
 echo ============================================================
 echo All operations completed successfully!
 echo Log file saved to Desktop as install_report.txt
-echo ============================================================
-pause
