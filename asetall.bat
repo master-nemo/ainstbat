@@ -27,22 +27,23 @@ if %errorLevel% == 0 (
 echo Installing Scoop...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$code = [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-RestMethod -Uri 'https://scoop.sh'; Invoke-Expression $code" >> "%LOG_FILE%" 2>&1
 
-echo.
 echo ============================================================
 echo [2/6] Ensure PATH
 echo ============================================================
 
 if exist "%ProgramData%\chocolatey\bin\refreshenv.cmd" (call "%ProgramData%\chocolatey\bin\refreshenv.cmd")
 
+for /f "tokens=2*" %%A in ('reg query "HKLM\System\CurrentControlSet\Control\Session Manager\Environment" /v Path 2^>nul') do set "SYS_PATH=%%B"
+for /f "tokens=2*" %%A in ('reg query "HKCU\Environment" /v Path 2^>nul') do set "USER_PATH=%%B"
+set "PATH=%SYS_PATH%;%USER_PATH%;C:\ProgramData\chocolatey\bin"
+
 where choco.exe >nul 2>nul
 if errorlevel 1 (
-    echo [!] No choco in session. Setting path via PowerShell...
+    echo [!] No choco in session. Forcing path via PowerShell...
     powershell -NoProfile -Command "$oldPath=[System.Environment]::GetEnvironmentVariable('Path','Machine'); if($oldPath -notlike '*chocolatey\bin*'){ [System.Environment]::SetEnvironmentVariable('Path',$oldPath+';C:\ProgramData\chocolatey\bin','Machine') }"
-    
-    @rem Принудительно добавляем в текущую сессию батника на случай сбоя refreshenv
     set "PATH=%PATH%;C:\ProgramData\chocolatey\bin"
 ) else (
-    echo [OK] Chocolatey environment initialized.
+    echo [OK] Chocolatey environment successfully initialized.
 )
 
 echo.
