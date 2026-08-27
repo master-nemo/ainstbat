@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 >nul
 
-:: 1. ПРОВЕРКА ПРАВ АДМИНИСТРАТОРА
+@rem 1. ПРОВЕРКА ПРАВ АДМИНИСТРАТОРА
 net session >nul 2>&1
 if %errorLevel% neq 0 (
     echo [!] ОШИБКА: Этот скрипт необходимо запускать ОТ ИМЕНИ АДМИНИСТРАТОРА.
@@ -22,11 +22,11 @@ echo ============================================================
 echo [1/5] (Chocolatey и Scoop)
 echo ============================================================
 
-:: 1. Chocolatey via WinGet
+@rem 1. Chocolatey via WinGet
 echo Chocolatey via WinGet...
 winget install --id chocolatey.chocolatey --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%LOG_FILE%" 2>&1
 
-:: 2. Установка Scoop через PowerShell
+@rem 2. Установка Scoop через PowerShell
 echo Scoop...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-RestMethod -Uri https://scoop.sh | Invoke-Expression" >> "%LOG_FILE%" 2>&1
 
@@ -42,7 +42,7 @@ if errorlevel 1 (
     echo [!] no choco in session.
     echo force set path via PowerShell API...
     
-    :: Безопасный метод добавления в реестр БЕЗ лимита в 1024 символа (замена опасного setx)
+    @rem Безопасный метод добавления в реестр БЕЗ лимита в 1024 символа (замена опасного setx)
     powershell -NoProfile -Command "$oldPath = [Environment]::GetEnvironmentVariable('Path', 'Machine'); if ($oldPath -notlike '*chocolatey\bin*') { [Environment]::SetEnvironmentVariable('Path', $oldPath + ';C:\ProgramData\chocolatey\bin', 'Machine') }"
     
     if exist "%ProgramData%\chocolatey\bin\refreshenv.cmd" call "%ProgramData%\chocolatey\bin\refreshenv.cmd"
@@ -107,7 +107,7 @@ echo remove Bloatware...
 echo ============================================================
 echo Отключение рекламы, экрана приветствия, поиск влево и скрытие поиска...
 
-:: Запуск оптимизированного PowerShell-блока (Edge не трогаем, OneDrive удаляется)
+@rem Запуск оптимизированного PowerShell-блока (Edge не трогаем, OneDrive удаляется)
 powershell -NoProfile -ExecutionPolicy Bypass -Command "^
     $apps = @('*3dbuilder*', '*windowscommunicationsapps*', '*officehub*', '*people*', '*windowsphone*', '*bingsports*', '*bingweather*', '*xboxapp*'); ^
     foreach ($app in $apps) { ^
@@ -116,7 +116,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "^
     }^
 "
 
-:: 1. Отключение экрана приветствия «Давайте познакомимся с настройками...» и запрет передачи персональных данных
+@rem 1. Отключение экрана приветствия «Давайте познакомимся с настройками...» и запрет передачи персональных данных
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /v "ScoobeSystemSettingEnabled" /t REG_DWORD /d 0 /f >nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-310093Enabled" /t REG_DWORD /d 0 /f >nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338389Enabled" /t REG_DWORD /d 0 /f >nul
@@ -124,35 +124,35 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" 
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-353694Enabled" /t REG_DWORD /d 0 /f >nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "RemindMeLaterWithScreenOn" /t REG_DWORD /d 0 /f >nul
 
-:: Телеметрия персонализации (галочки в запрет)
+@rem Телеметрия персонализации (галочки в запрет)
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Privacy" /v "TailoredExperiencesWithDiagnosticDataEnabled" /t REG_DWORD /d 0 /f >nul
 
-:: 2. Перенос Меню Пуск в левый угол (для Windows 11)
+@rem 2. Перенос Меню Пуск в левый угол (для Windows 11)
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarAl" /t REG_DWORD /d 0 /f >nul
 
-:: 3. Полное скрытие строки/иконки поиска из панели задач
+@rem 3. Полное скрытие строки/иконки поиска из панели задач
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v "SearchboxTaskbarMode" /t REG_DWORD /d 0 /f >nul
 
-:: 4.  Полное отключение Виджетов (Новости, погода) на панели задач
+@rem 4.  Полное отключение Виджетов (Новости, погода) на панели задач
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarDa" /t REG_DWORD /d 0 /f >nul
 
-:: 5.  Отключение веб-поиска Bing в меню Пуск (ускоряет поиск и убирает мусор)
+@rem 5.  Отключение веб-поиска Bing в меню Пуск (ускоряет поиск и убирает мусор)
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v "BingSearchEnabled" /t REG_DWORD /d 0 /f >nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v "CortanaConsent" /t REG_DWORD /d 0 /f >nul
 
-:: 6. НОВОЕ: Запрет автоустановки сторонних приложений и игр (Candy Crush, партнерский софт)
+@rem 6. НОВОЕ: Запрет автоустановки сторонних приложений и игр (Candy Crush, партнерский софт)
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SilentInstalledAppsEnabled" /t REG_DWORD /d 0 /f >nul
 reg add "HKLM\Software\Policies\Microsoft\Windows\CloudContent" /v "DisableWindowsConsumerFeatures" /t REG_DWORD /d 1 /f >nul
 
-:: 7. НОВОЕ: Возврат классического контекстного меню (Windows 10 style) для Windows 11
+@rem 7. НОВОЕ: Возврат классического контекстного меню (Windows 10 style) для Windows 11
 reg add "HKCU\Software\Classes\CLSID\{5a2121c1-95a2-4599-9596-333f4c267061}\InprocServer32" /ve /t REG_SZ /d "" /f >nul
 
-:: 8. Удаление OneDrive из системы (если он остался в фоне)
+@rem 8. Удаление OneDrive из системы (если он остался в фоне)
 taskkill /f /im OneDrive.exe >nul 2>&1
 if exist "%SystemRoot%\System32\OneDriveSetup.exe" start "" /wait "%SystemRoot%\System32\OneDriveSetup.exe" /uninstall
 if exist "%SystemRoot%\SysWOW64\OneDriveSetup.exe" start "" /wait "%SystemRoot%\SysWOW64\OneDriveSetup.exe" /uninstall
 
-:: Перезапускаем проводник, чтобы применить настройки интерфейса мгновенно
+@rem Перезапускаем проводник, чтобы применить настройки интерфейса мгновенно
 taskkill /f /im explorer.exe >nul 2>&1
 start explorer.exe
 
@@ -170,28 +170,28 @@ echo ============================================================
 @echo off
 setlocal enabledelayedexpansion
 
-:: 3. ГЛОБАЛЬНАЯ УСТАНОВКА UV ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ
+@rem 3. ГЛОБАЛЬНАЯ УСТАНОВКА UV ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ
 echo Установка утилиты UV глобально для всех пользователей...
 set "UV_DIR=C:\Program Files\uv"
 if not exist "%UV_DIR%" mkdir "%UV_DIR%"
 
-:: Скачивание и установка uv в общую папку
+@rem Скачивание и установка uv в общую папку
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$env:UV_INSTALL_DIR='%UV_DIR%'; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://astral.sh/uv/install.ps1 | iex"
 
-:: Добавление папки uv в системный PATH (если её там еще нет)
+@rem Добавление папки uv в системный PATH (если её там еще нет)
 set "PATH_TO_ADD=%UV_DIR%"
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$sysPath = [Environment]::GetEnvironmentVariable('Path', 'Machine'); if ($sysPath -notlike '*%PATH_TO_ADD%*') { [Environment]::SetEnvironmentVariable('Path', $sysPath + ';%PATH_TO_ADD%', 'Machine') }"
 
-:: Обновляем PATH в текущей сессии батника
+@rem Обновляем PATH в текущей сессии батника
 set "PATH=%PATH%;%UV_DIR%"
 
 echo.
 echo --------------------------------------------------
 echo.
 
-:: 4. УСТАНОВКА ПОСЛЕДНЕГО PYTHON 3.9.* ЧЕРЕЗ UV
+@rem 4. УСТАНОВКА ПОСЛЕДНЕГО PYTHON 3.9.* ЧЕРЕЗ UV
 echo [3/4] + Python 3.9.* via UV...
-:: Принудительно ставим в общую директорию Program Data, чтобы было доступно всем
+@rem Принудительно ставим в общую директорию Program Data, чтобы было доступно всем
 set "UV_PYTHON_INSTALL_DIR=C:\ProgramData\uv\python"
 if not exist "%UV_PYTHON_INSTALL_DIR%" mkdir "%UV_PYTHON_INSTALL_DIR%"
 
@@ -201,10 +201,10 @@ echo.
 echo --------------------------------------------------
 echo.
 
-:: 5. ИНТЕГРАЦИЯ С PY.EXE (РЕГИСТРАЦИЯ В РЕЕСТРЕ)
+@rem 5. ИНТЕГРАЦИЯ С PY.EXE (РЕГИСТРАЦИЯ В РЕЕСТРЕ)
 echo [4/4] Python 3.9 -> py.exe...
 
-:: Находим точный путь к установленному python.exe внутри папки uv
+@rem Находим точный путь к установленному python.exe внутри папки uv
 for /f "delims=" %%i in ('dir "%UV_PYTHON_INSTALL_DIR%\*python.exe" /s /b 2^>nul') do (
     set "PY_EXE_PATH=%%i"
     goto :found_python
@@ -216,15 +216,15 @@ if "%PY_EXE_PATH%"=="" (
     goto :end
 )
 
-:: Получаем только папку, где лежит python.exe
+@rem Получаем только папку, где лежит python.exe
 for %%F in ("%PY_EXE_PATH%") do set "PY_DIR_PATH=%%~dpF"
-:: Убираем обратный слэш на конце для корректности путей реестра
+@rem Убираем обратный слэш на конце для корректности путей реестра
 if "%PY_DIR_PATH:~-1%"=="\" set "PY_DIR_PATH=%PY_DIR_PATH:~0,-1%"
 
 echo Найден Python по адресу: %PY_EXE_PATH%
 echo Регистрируем в HKLM для py.exe...
 
-:: Прописываем ветки реестра Core, чтобы py.exe распознал версию 3.9
+@rem Прописываем ветки реестра Core, чтобы py.exe распознал версию 3.9
 reg add "HKLM\SOFTWARE\Python\PythonCore\3.9" /v "DisplayName" /t REG_SZ /d "Python 3.9 (uv Shared)" /f >nul
 reg add "HKLM\SOFTWARE\Python\PythonCore\3.9\InstallPath" /t REG_SZ /d "%PY_DIR_PATH%" /f >nul
 reg add "HKLM\SOFTWARE\Python\PythonCore\3.9\InstallPath" /v "ExecutablePath" /t REG_SZ /d "%PY_EXE_PATH%" /f >nul
