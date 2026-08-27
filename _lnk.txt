@@ -1,0 +1,59 @@
+_lnk
+
+== new GH ver
+## ainstbat
+irm clck.ru/3VTU4Q | iex
+irm clck.ru/3VTVpT | iex
+irm goo.su/IL2OdTp | iex
+irm https://raw.githubusercontent.com/master-nemo/ainstbat/refs/heads/main/a1.ps1 | iex
+
+
+
+https://github.com/master-nemo/ainstbat/archive/refs/heads/main.zip
+
+===================
+===================
+atools
+
+		+on gist:
+		=main=
+https://gist.github.com/master-nemo/e68e238d40862f10ea9d04b77db57ee2
+	=	https://vk.cc/ciadrz
+	
+		=zip=
+https://gist.github.com/master-nemo/e68e238d40862f10ea9d04b77db57ee2/archive/decad130279c6ea96f7089f5837a26355fe0c47a.zip
+	https://goo.su/aatoolz
+	https://vk.cc/ciadiq
+	https://goo.su/atoolz		DdH3@QBfWReXEIZx
+	
+	----=3autobase.bat
+	https://vk.cc/ciadam
+	iwr -Uri "https://vk.cc/ciadam" -OutFile ".\atoolsa.bat"
+	https://goo.su/aatoolsa
+	http://bit.do/atoolsa
+	https://goo.su/atoolsa	DdH3@QBfWReXEIZx
+https://gist.githubusercontent.com/master-nemo/e68e238d40862f10ea9d04b77db57ee2/raw/e1cd096d32a5bcad6592990d91a7cb711b10889b/3autobase.bat
+
+(obsolete)	http://bit.do/atools		http://bit.do/atoolz
+
+https://goo.su/lang/ru	pass=DdH3@QBfWReXEIZx
+
+----- ps: download: iwr -Uri "http://www.contoso.com" -OutFile "C:\path\file"	## iwr=wget=pseudonim of Invoke-WebRequest 
+
+iwr -Uri "https://vk.cc/ciadam" -OutFile ".\atoolsa.bat"
+iwr -Uri "https://goo.su/aatoolsa" -OutFile ".\atoolsa.bat"
+iwr -Uri "http://bit.do/atoolsa" -OutFile ".\atoolsa.bat"
+
+
+rems 
+	https://pastebin.com/6uTtpBe9
+	http://bit.do/55tmp
+
+
+https://pastebin.com/	55adm 	kf,jhfnjhbz55
+
+
+past
+http://bit.do/55tmp
+
+reg2 	sz7mmt@kjkszpjcompany.com

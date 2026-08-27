@@ -1,7 +1,6 @@
 @echo off
 chcp 65001 >nul
 
-@rem 1. ПРОВЕРКА ПРАВ АДМИНИСТРАТОРА
 net session >nul 2>&1
 if %errorLevel% neq 0 (
     echo [!] ОШИБКА: Этот скрипт необходимо запускать ОТ ИМЕНИ АДМИНИСТРАТОРА.
@@ -17,11 +16,9 @@ echo ============================================================
 echo [1/5] (Chocolatey и Scoop)
 echo ============================================================
 
-@rem 1. Chocolatey via WinGet
 echo Chocolatey via WinGet...
 winget install --id chocolatey.chocolatey --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%LOG_FILE%" 2>&1
 
-@rem 2. Установка Scoop через PowerShell
 echo Scoop...
 powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-RestMethod -Uri 'https://scoop.sh' ^| Invoke-Expression" >> "%LOG_FILE%" 2>&1
 
@@ -37,7 +34,6 @@ if errorlevel 1 (
     echo [!] no choco in session.
     echo force set path via PowerShell API...
     
-    @rem Безопасный метод добавления в реестр БЕЗ лимита в 1024 символа (замена опасного setx)
     powershell -NoProfile -Command "$oldPath = [Environment]::GetEnvironmentVariable('Path', 'Machine'); if ($oldPath -notlike '*chocolatey\bin*') { [Environment]::SetEnvironmentVariable('Path', $oldPath + ';C:\ProgramData\chocolatey\bin', 'Machine') }"
     
     if exist "%ProgramData%\chocolatey\bin\refreshenv.cmd" call "%ProgramData%\chocolatey\bin\refreshenv.cmd"
@@ -102,7 +98,6 @@ echo remove Bloatware...
 echo ============================================================
 echo Отключение рекламы, экрана приветствия, поиск влево и скрытие поиска...
 
-@rem Запуск оптимизированного PowerShell-блока (Edge не трогаем, OneDrive удаляется)
 REM powershell -NoProfile -ExecutionPolicy Bypass -Command "^
     REM $apps = @('*3dbuilder*', '*windowscommunicationsapps*', '*officehub*', '*people*', '*windowsphone*', '*bingsports*', '*bingweather*', '*xboxapp*'); ^
     REM foreach ($app in $apps) { ^
@@ -113,7 +108,6 @@ REM "
 
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$apps = @('*3dbuilder*', '*windowscommunicationsapps*', '*officehub*', '*people*', '*windowsphone*', '*bingsports*', '*bingweather*', '*xboxapp*'); foreach ($app in $apps) { Get-AppxPackage -AllUsers $app | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue; Get-AppXProvisionedPackage -Online | Where-Object {$_.DisplayName -like $app} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue }"
 
-@rem 1. Отключение экрана приветствия Давайте познакомимся с настройками... и запрет передачи персональных данных
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /v "ScoobeSystemSettingEnabled" /t REG_DWORD /d 0 /f >nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-310093Enabled" /t REG_DWORD /d 0 /f >nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338389Enabled" /t REG_DWORD /d 0 /f >nul
@@ -121,35 +115,26 @@ reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" 
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-353694Enabled" /t REG_DWORD /d 0 /f >nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "RemindMeLaterWithScreenOn" /t REG_DWORD /d 0 /f >nul
 
-@rem Телеметрия персонализации (галочки в запрет)
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Privacy" /v "TailoredExperiencesWithDiagnosticDataEnabled" /t REG_DWORD /d 0 /f >nul
 
-@rem 2. Перенос Меню Пуск в левый угол (для Windows 11)
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarAl" /t REG_DWORD /d 0 /f >nul
 
-@rem 3. Полное скрытие строки/иконки поиска из панели задач
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v "SearchboxTaskbarMode" /t REG_DWORD /d 0 /f >nul
 
-@rem 4.  Полное отключение Виджетов (Новости, погода) на панели задач
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarDa" /t REG_DWORD /d 0 /f >nul
 
-@rem 5.  Отключение веб-поиска Bing в меню Пуск (ускоряет поиск и убирает мусор)
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v "BingSearchEnabled" /t REG_DWORD /d 0 /f >nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v "CortanaConsent" /t REG_DWORD /d 0 /f >nul
 
-@rem 6. НОВОЕ: Запрет автоустановки сторонних приложений и игр (Candy Crush, партнерский софт)
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SilentInstalledAppsEnabled" /t REG_DWORD /d 0 /f >nul
 reg add "HKLM\Software\Policies\Microsoft\Windows\CloudContent" /v "DisableWindowsConsumerFeatures" /t REG_DWORD /d 1 /f >nul
 
-@rem 7. НОВОЕ: Возврат классического контекстного меню (Windows 10 style) для Windows 11
 reg add "HKCU\Software\Classes\CLSID\{5a2121c1-95a2-4599-9596-333f4c267061}\InprocServer32" /ve /t REG_SZ /d "" /f >nul
 
-@rem 8. Удаление OneDrive из системы (если он остался в фоне)
 taskkill /f /im OneDrive.exe >nul 2>&1
 if exist "%SystemRoot%\System32\OneDriveSetup.exe" start "" /wait "%SystemRoot%\System32\OneDriveSetup.exe" /uninstall
 if exist "%SystemRoot%\SysWOW64\OneDriveSetup.exe" start "" /wait "%SystemRoot%\SysWOW64\OneDriveSetup.exe" /uninstall
 
-@rem Перезапускаем проводник, чтобы применить настройки интерфейса мгновенно
 taskkill /f /im explorer.exe >nul 2>&1
 start explorer.exe
 
