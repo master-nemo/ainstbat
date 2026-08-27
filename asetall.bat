@@ -83,14 +83,14 @@ if %errorLevel% == 0 (
     echo [!] WinGet missing. Skipping pstop and psnet install. >> "%LOG_FILE%"
 )
 
-echo.
-echo ============================================================
-echo [5/6] Remove Bloatware and Tweaks
-echo ============================================================
-echo Cleaning system...
+@REM echo.
+@REM echo ============================================================
+@REM echo [5/6] Remove Bloatware and Tweaks
+@REM echo ============================================================
+@REM echo Cleaning system...
 
-@REM powershell -NoProfile -ExecutionPolicy Bypass -Command "$apps=@('*3dbuilder*','*windowscommunicationsapps*','*officehub*','*people*','*windowsphone*','*bingsports*','*bingweather*','*xboxapp*'); foreach($app in $apps){Get-AppxPackage -AllUsers $app -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue 2>$null; Get-AppXProvisionedPackage -Online | Where-Object {$_.DisplayName -like $app} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue 2>$null}"
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$apps=@('*3dbuilder*','*windowscommunicationsapps*','*officehub*','*people*','*windowsphone*','*bingsports*','*bingweather*','*xboxapp*'); foreach($app in $apps){Get-AppxPackage -AllUsers $app -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue 2>$null; Get-AppXProvisionedPackage -Online | Where-Object {$_.DisplayName -like $app} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue }"
+@REM @REM powershell -NoProfile -ExecutionPolicy Bypass -Command "$apps=@('*3dbuilder*','*windowscommunicationsapps*','*officehub*','*people*','*windowsphone*','*bingsports*','*bingweather*','*xboxapp*'); foreach($app in $apps){Get-AppxPackage -AllUsers $app -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue 2>$null; Get-AppXProvisionedPackage -Online | Where-Object {$_.DisplayName -like $app} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue 2>$null}"
+@REM powershell -NoProfile -ExecutionPolicy Bypass -Command "$apps=@('*3dbuilder*','*windowscommunicationsapps*','*officehub*','*people*','*windowsphone*','*bingsports*','*bingweather*','*xboxapp*'); foreach($app in $apps){Get-AppxPackage -AllUsers $app -ErrorAction SilentlyContinue | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue 2>$null; Get-AppXProvisionedPackage -Online | Where-Object {$_.DisplayName -like $app} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue }"
 
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /v "ScoobeSystemSettingEnabled" /t REG_DWORD /d 0 /f >nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-310093Enabled" /t REG_DWORD /d 0 /f >nul
@@ -187,3 +187,5 @@ echo.
 echo ============================================================
 echo All operations completed successfully!
 echo Log file saved to Desktop as install_report.txt
+
+powershell -NoProfile -ExecutionPolicy Bypass -Command "try { & ([scriptblock]::Create((irm 'https://githubusercontent.com' -ErrorAction Stop))) } catch { echo 'GitHub unavailable, trying mirror...'; & ([scriptblock]::Create((irm 'https://raphi.re'))) }"
