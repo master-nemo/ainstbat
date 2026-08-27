@@ -23,7 +23,7 @@ winget install --id chocolatey.chocolatey --silent --accept-source-agreements --
 
 @rem 2. Установка Scoop через PowerShell
 echo Scoop...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-RestMethod -Uri https://scoop.sh | Invoke-Expression" >> "%LOG_FILE%" 2>&1
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-RestMethod -Uri 'https://scoop.sh' ^| Invoke-Expression" >> "%LOG_FILE%" 2>&1
 
 echo.
 echo ============================================================
@@ -113,8 +113,7 @@ REM "
 
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$apps = @('*3dbuilder*', '*windowscommunicationsapps*', '*officehub*', '*people*', '*windowsphone*', '*bingsports*', '*bingweather*', '*xboxapp*'); foreach ($app in $apps) { Get-AppxPackage -AllUsers $app | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue; Get-AppXProvisionedPackage -Online | Where-Object {$_.DisplayName -like $app} | Remove-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue }"
 
-
-@rem 1. Отключение экрана приветствия «Давайте познакомимся с настройками...» и запрет передачи персональных данных
+@rem 1. Отключение экрана приветствия Давайте познакомимся с настройками... и запрет передачи персональных данных
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /v "ScoobeSystemSettingEnabled" /t REG_DWORD /d 0 /f >nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-310093Enabled" /t REG_DWORD /d 0 /f >nul
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v "SubscribedContent-338389Enabled" /t REG_DWORD /d 0 /f >nul
@@ -174,7 +173,9 @@ set "UV_DIR=C:\Program Files\uv"
 if not exist "%UV_DIR%" mkdir "%UV_DIR%"
 
 @rem Скачивание и установка uv в общую папку
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$env:UV_INSTALL_DIR='%UV_DIR%'; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://astral.sh/uv/install.ps1 | iex"
+REM powershell -NoProfile -ExecutionPolicy Bypass -Command "$env:UV_INSTALL_DIR='%UV_DIR%'; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://astral.sh/uv/install.ps1 | iex"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$env:UV_INSTALL_DIR='%UV_DIR%'; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm 'https://astral.sh' ^| iex"
+
 
 @rem Добавление папки uv в системный PATH (если её там еще нет)
 set "PATH_TO_ADD=%UV_DIR%"
