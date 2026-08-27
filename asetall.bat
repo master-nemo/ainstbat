@@ -13,11 +13,6 @@ if %errorLevel% neq 0 (
 set "LOG_FILE=%USERPROFILE%\Desktop\install_report.txt"
 echo Инициализация установки: %date% %time% > "%LOG_FILE%"
 
-REM echo ============================================================
-REM echo [0] debloat1
-REM powershell -NoProfile -ExecutionPolicy Bypass -Command "try { & ([scriptblock]::Create((irm 'https://githubusercontent.com' -ErrorAction Stop))) } catch { echo 'GitHub unavailable, trying mirror...'; & ([scriptblock]::Create((irm 'https://raphi.re'))) }"
-REM echo ============================================================
-
 echo ============================================================
 echo [1/5] (Chocolatey и Scoop)
 echo ============================================================
