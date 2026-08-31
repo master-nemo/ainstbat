@@ -17,14 +17,24 @@ echo ============================================================
 @rem 1. Chocolatey via WinGet
 echo Chocolatey via WinGet...
 
+@REM where winget >nul 2>nul
+@REM if %errorLevel% == 0 (
+@REM     echo Installing Chocolatey via WinGet...
+@REM     winget install --id chocolatey.chocolatey --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%LOG_FILE%" 2>&1
+@REM ) else (
+@REM     echo [!] WinGet not found. Installing Chocolatey natively via PowerShell...
+@REM     powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org'))" 
+@REM )
+
 where winget >nul 2>nul
 if %errorLevel% == 0 (
     echo Installing Chocolatey via WinGet...
     winget install --id chocolatey.chocolatey --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%LOG_FILE%" 2>&1
 ) else (
     echo [!] WinGet not found. Installing Chocolatey natively via PowerShell...
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org'))" 
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org'))"
 )
+
 echo xxxxxxxxxxxxx
 call %ProgramData%\chocolatey\bin\refreshenv
 echo yyyyyyyyyyyyy
