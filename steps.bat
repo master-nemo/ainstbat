@@ -25,20 +25,22 @@ if %errorLevel% == 0 (
     echo [!] WinGet not found. Installing Chocolatey natively via PowerShell...
     powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org'))" 
 )
-
+echo xxxxxxxxxxxxx
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+echo yyyyyyyyyyyyy
 
 choco -?
-echo ===(& choco -?)===
+echo zzzzzzzzzzzzz
+@REM echo ===(& choco -?)===
 
-@rem 2. Установка Scoop через PowerShell
-echo Scoop...
-:: (no pipe ver of std way: Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
-powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = 3072; [scriptblock]::Create((Invoke-RestMethod https://get.scoop.sh)).Invoke()"
+@REM @rem 2. Установка Scoop через PowerShell
+@REM echo Scoop...
+@REM :: (no pipe ver of std way: Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+@REM powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = 3072; [scriptblock]::Create((Invoke-RestMethod https://get.scoop.sh)).Invoke()"
 
 
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
-echo ===(& scoop -?)===
+@REM $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+@REM echo ===(& scoop -?)===
 
 
 
