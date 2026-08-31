@@ -26,7 +26,7 @@ if %errorLevel% == 0 (
     powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org'))" 
 )
 echo xxxxxxxxxxxxx
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+call %ProgramData%\chocolatey\bin\refreshenv
 echo yyyyyyyyyyyyy
 
 choco -?
