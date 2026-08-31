@@ -16,8 +16,30 @@ echo ============================================================
 
 @rem 1. Chocolatey via WinGet
 echo Chocolatey via WinGet...
-winget install --id chocolatey.chocolatey --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%LOG_FILE%" 2>&1
+
+where winget >nul 2>nul
+if %errorLevel% == 0 (
+    echo Installing Chocolatey via WinGet...
+    winget install --id chocolatey.chocolatey --silent --accept-source-agreements --accept-package-agreements --disable-interactivity >> "%LOG_FILE%" 2>&1
+) else (
+    echo [!] WinGet not found. Installing Chocolatey natively via PowerShell...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org'))" 
+)
+
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+
+choco -?
+echo ===(& choco -?)===
 
 @rem 2. Установка Scoop через PowerShell
 echo Scoop...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-RestMethod -Uri 'https://scoop.sh' ^| Invoke-Expression" >> "%LOG_FILE%" 2>&1
+:: (no pipe ver of std way: Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol = 3072; [scriptblock]::Create((Invoke-RestMethod https://get.scoop.sh)).Invoke()"
+
+
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+echo ===(& scoop -?)===
+
+
+
+pause
