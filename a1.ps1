@@ -7,6 +7,8 @@
 # ==============================================================================
 # from bat @chcp 65001 >nul & powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0setup.ps1"
 # ==============================================================================
+# . "$PSScriptRoot\asetall.ps1"
+# ==============================================================================
 $ErrorActionPreference = "Stop"
 $zipUrl = "https://github.com/master-nemo/ainstbat/archive/refs/heads/main.zip" 
 
@@ -42,45 +44,31 @@ Write-Host "[*] Скачивание архива из репозитория...
 # Переменная с адресом вашего ZIP (замените URL1 на реальную ссылку при деплое)
 $zipFile = Join-Path $targetDir "_gist.zip"
 
+Remove-Item -Path $zipFile -Force -ErrorAction SilentlyContinue
 Invoke-WebRequest -Uri $zipUrl -OutFile $zipFile
 
 # 4. Распаковка архива (встроенным методом, заменяющим старый ZipFile)
 Write-Host "[*] Распаковка компонентов..." -ForegroundColor Cyan
 Expand-Archive -Path $zipFile -DestinationPath $targetDir -Force
-# Примечание: сам файл _gist.zip НЕ удаляется, как вы просили, и остается в папке
+# Примечание: сам файл _gist.zip НЕ удаляется, и остается в папке
 
-# # 5. Рекурсивный поиск и запуск главного файла asetall.bat
-# Write-Host "[*] Поиск и запуск главного сценария asetall.bat..." -ForegroundColor Cyan
-# $batFile = Get-ChildItem -Path $targetDir -Filter "asetall.bat" -Recurse | Select-Object -First 1
+. "$PSScriptRoot\asetall.ps1"
 
-# if ($batFile) {
-#     $batDir = $batFile.DirectoryName
-#     Write-Host "[OK] Скрипт найден в: $batDir" -ForegroundColor Green
-    
-#     # Переходим в подпапку, где лежит сам bat, чтобы его внутренние относительные пути не ломались
-#     Set-Location -Path $batDir
-    
-#     # Запускаем классический bat-файл в контексте текущего окна CMD
-#     Start-Process -FilePath "cmd.exe" -ArgumentList "/c call `"$($batFile.FullName)`"" -Wait
-# } else {
-#     Write-Error "Критическая ошибка: Файл asetall.bat не найден внутри распакованного архива!"
-# }
-
-
-# 5. Рекурсивный поиск и запуск главного файла steps.bat
-Write-Host "[*] Поиск и запуск главного сценария steps.bat..." -ForegroundColor Cyan
-$batFile = Get-ChildItem -Path $targetDir -Filter "steps.bat" -Recurse | Select-Object -First 1
-
-if ($batFile) {
-    $batDir = $batFile.DirectoryName
-    Write-Host "[OK] Скрипт найден в: $batDir" -ForegroundColor Green
-    
-    # Переходим в подпапку, где лежит сам bat, чтобы его внутренние относительные пути не ломались
-    Set-Location -Path $batDir
-    
-    # Запускаем классический bat-файл в контексте текущего окна CMD
-    Start-Process -FilePath "cmd.exe" -ArgumentList "/c call `"$($batFile.FullName)`"" -Wait
-} else {
-    Write-Error "Критическая ошибка: Файл steps.bat не найден внутри распакованного архива!"
-}
+## # for bat ver 
+## # 5. Рекурсивный поиск и запуск главного файла steps.bat
+## Write-Host "[*] Поиск и запуск главного сценария steps.bat..." -ForegroundColor Cyan
+## $batFile = Get-ChildItem -Path $targetDir -Filter "steps.bat" -Recurse | Select-Object -First 1
+## 
+## if ($batFile) {
+##     $batDir = $batFile.DirectoryName
+##     Write-Host "[OK] Скрипт найден в: $batDir" -ForegroundColor Green
+##     
+##     # Переходим в подпапку, где лежит сам bat, чтобы его внутренние относительные пути не ломались
+##     Set-Location -Path $batDir
+##     
+##     # Запускаем классический bat-файл в контексте текущего окна CMD
+##     Start-Process -FilePath "cmd.exe" -ArgumentList "/c call `"$($batFile.FullName)`"" -Wait
+## } else {
+##     Write-Error "Критическая ошибка: Файл steps.bat не найден внутри распакованного архива!"
+## }
 
