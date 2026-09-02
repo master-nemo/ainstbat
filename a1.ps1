@@ -52,7 +52,9 @@ Write-Host "[*] Распаковка компонентов..." -ForegroundColor
 Expand-Archive -Path $zipFile -DestinationPath $targetDir -Force
 # Примечание: сам файл _gist.zip НЕ удаляется, и остается в папке
 
+echo 111111
 . "$PSScriptRoot\asetall.ps1"
+echo 222222
 
 ## # for bat ver 
 ## # 5. Рекурсивный поиск и запуск главного файла steps.bat
