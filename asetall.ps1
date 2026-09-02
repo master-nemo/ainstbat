@@ -166,8 +166,9 @@ Stop-Process -Name "explorer" -Force
 echo "Install UV, Python 3.9 and Python Launcher - v2" 
 $env:UV_INSTALL_DIR='C:\dev\uv'; irm https://astral.sh/uv/install.ps1 | iex
 [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\dev\uv", [EnvironmentVariableTarget]::Machine)
+$env:Path += ";C:\dev\uv"
 
-. uv python install -p 3.9
+uv python install 3.9
 ### 
 
 # ---------------------------------------------------------------------------- #
