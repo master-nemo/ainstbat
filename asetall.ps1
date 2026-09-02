@@ -76,7 +76,7 @@ foreach ($tweak in $regTweaks) {
     $type = $tweak[3]
     if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null }
     # Set-ItemProperty -Path $path -Name $name -Value $value -PropertyType $type -Force
-    Set-ItemProperty -Path $path -Name $name -Value $value -Type $type -Force -ErrorAction SilentlyContinue
+    Set-ItemProperty -Path $path -Name $name -Value $value -Type $type -Force -ErrorAction Continue
 }
 
 # Windows 11 Classic Context Menu
