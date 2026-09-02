@@ -22,10 +22,11 @@ if (Get-Command winget -ErrorAction SilentlyContinue) {
     $ErrorActionPreference = "Continue"
 }
 
-# Strictly official lines from scoop.sh
+if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force -ErrorAction Continue
 Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
 $ErrorActionPreference = "Continue"
+}
 
 # ============================================================
 # Path Synchronization
