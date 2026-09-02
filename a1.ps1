@@ -55,7 +55,7 @@ Expand-Archive -Path $zipFile -DestinationPath $targetDir -Force
 echo 000
 echo "$targetDir\ainstbat-main"
 Set-Location "$targetDir\ainstbat-main"
-. asetall.ps1
+. .\asetall.ps1
 
 echo 111111
 # # . "$PSScriptRoot\asetall.ps1"
