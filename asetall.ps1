@@ -105,62 +105,70 @@ if ((Get-Service -Name sshd).Status -ne "Running") { Start-Service -Name sshd }
 Write-Output "Restart File Explorer to apply UI tweaks instantly"
 Stop-Process -Name "explorer" -Force
 
-# ============================================================
-# Install UV, Python 3.9 and Python Launcher
-# ============================================================
-Write-Output "Install UV, Python 3.9 and Python Launcher"
-$uvDir = "C:\Program Files\uv"
-if (-not (Test-Path $uvDir)) { New-Item -ItemType Directory -Path $uvDir -Force | Out-Null }
+### # ============================================================
+### # Install UV, Python 3.9 and Python Launcher
+### # ============================================================
+### Write-Output "Install UV, Python 3.9 and Python Launcher"
+### $uvDir = "C:\Program Files\uv"
+### if (-not (Test-Path $uvDir)) { New-Item -ItemType Directory -Path $uvDir -Force | Out-Null }
+### 
+### if (Get-Command winget -ErrorAction SilentlyContinue) {
+###     winget install --id Python.Launcher --silent --accept-source-agreements --accept-package-agreements
+### } else {
+###     # Official direct standalone Python Launcher package url
+###     $pyLauncherUrl = 'https://python.org'
+###     Invoke-WebRequest -Uri $pyLauncherUrl -OutFile "$env:TEMP\py_setup.exe"
+###     if (Test-Path "$env:TEMP\py_setup.exe") {
+###         Start-Process "$env:TEMP\py_setup.exe" -ArgumentList "/quiet InstallLauncherAllUsers=1 PrependPath=1 Include_test=0 Include_pip=0 Include_doc=0 Include_dev=0 Include_exe=0 Include_lib=0" -Wait
+###     }
+### }
+### 
+### # Strictly official line from astral.sh documentation
+### $env:UV_INSTALL_DIR = $uvDir
+### powershell -ExecutionPolicy Bypass -c "irm https://astral.sh | iex"
+### 
+### # Register UV folder in Machine PATH environment variable
+### $sysPath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine')
+### if ($sysPath -notlike '*C:\Program Files\uv*') {
+    ###     [System.Environment]::SetEnvironmentVariable('Path', ($sysPath + ';C:\Program Files\uv'), 'Machine')
+### }
+### $env:Path += ";$uvDir"
+### 
+### # Install Python 3.9 via UV tool chain
+### $uvExe = "$uvDir\uv.exe"
+### if (Test-Path $uvExe) {
+###     & $uvExe python install 3.9
+### }
+### 
+### # Locate deployed python.exe path inside UV structure to link it with py.exe launcher
+### $uvPythonDir = "C:\ProgramData\uv\python"
+### $pyExePath = (Get-ChildItem -Path $uvPythonDir -Filter "python.exe" -Recurse | Select-Object -First 1).FullName
+### 
+### if ($pyExePath) {
+###     $pyDirPath = Split-Path -Path $pyExePath -Parent
+###     $hklmCorePath = "HKLM:\SOFTWARE\Python\PythonCore\3.9"
+###     $hklmInstallPath = "HKLM:\SOFTWARE\Python\PythonCore\3.9\InstallPath"
+###     
+###     if (-not (Test-Path $hklmCorePath)) { New-Item -Path $hklmCorePath -Force | Out-Null }
+###     if (-not (Test-Path $hklmInstallPath)) { New-Item -Path $hklmInstallPath -Force | Out-Null }
+###     
+###     Set-ItemProperty -Path $hklmCorePath -Name "DisplayName" -Value "Python 3.9 (uv Shared)" -Force
+###     Set-ItemProperty -Path $hklmInstallPath -Name "(Default)" -Value $pyDirPath -Force
+###     Set-ItemProperty -Path $hklmInstallPath -Name "ExecutablePath" -Value $pyExePath -Force
+### }
+### 
+### # Run final checks
+### # ---------------------------------------------------------------------------- #
+### if (Get-Command py -ErrorAction SilentlyContinue) {  & py -3.9 --version }
+### elseif ($pyExePath) { & $pyExePath --version }
 
-if (Get-Command winget -ErrorAction SilentlyContinue) {
-    winget install --id Python.Launcher --silent --accept-source-agreements --accept-package-agreements
-} else {
-    # Official direct standalone Python Launcher package url
-    $pyLauncherUrl = 'https://python.org'
-    Invoke-WebRequest -Uri $pyLauncherUrl -OutFile "$env:TEMP\py_setup.exe"
-    if (Test-Path "$env:TEMP\py_setup.exe") {
-        Start-Process "$env:TEMP\py_setup.exe" -ArgumentList "/quiet InstallLauncherAllUsers=1 PrependPath=1 Include_test=0 Include_pip=0 Include_doc=0 Include_dev=0 Include_exe=0 Include_lib=0" -Wait
-    }
-}
+# powershell -ExecutionPolicy ByPass -c "$env:UV_INSTALL_DIR='C:\Program Files\uv'; irm https://astral.sh/uv/install.ps1 | iex"
+echo "Install UV, Python 3.9 and Python Launcher - v2" 
+$env:UV_INSTALL_DIR='C:\dev\uv'; irm https://astral.sh/uv/install.ps1 | iex
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\dev\uv", [EnvironmentVariableTarget]::Machine)
 
-# Strictly official line from astral.sh documentation
-$env:UV_INSTALL_DIR = $uvDir
-powershell -ExecutionPolicy Bypass -c "irm https://astral.sh | iex"
-
-# Register UV folder in Machine PATH environment variable
-$sysPath = [System.Environment]::GetEnvironmentVariable('Path', 'Machine')
-if ($sysPath -notlike '*C:\Program Files\uv*') {
-    [System.Environment]::SetEnvironmentVariable('Path', ($sysPath + ';C:\Program Files\uv'), 'Machine')
-}
-$env:Path += ";$uvDir"
-
-# Install Python 3.9 via UV tool chain
-$uvExe = "$uvDir\uv.exe"
-if (Test-Path $uvExe) {
-    & $uvExe python install 3.9
-}
-
-# Locate deployed python.exe path inside UV structure to link it with py.exe launcher
-$uvPythonDir = "C:\ProgramData\uv\python"
-$pyExePath = (Get-ChildItem -Path $uvPythonDir -Filter "python.exe" -Recurse | Select-Object -First 1).FullName
-
-if ($pyExePath) {
-    $pyDirPath = Split-Path -Path $pyExePath -Parent
-    $hklmCorePath = "HKLM:\SOFTWARE\Python\PythonCore\3.9"
-    $hklmInstallPath = "HKLM:\SOFTWARE\Python\PythonCore\3.9\InstallPath"
-    
-    if (-not (Test-Path $hklmCorePath)) { New-Item -Path $hklmCorePath -Force | Out-Null }
-    if (-not (Test-Path $hklmInstallPath)) { New-Item -Path $hklmInstallPath -Force | Out-Null }
-    
-    Set-ItemProperty -Path $hklmCorePath -Name "DisplayName" -Value "Python 3.9 (uv Shared)" -Force
-    Set-ItemProperty -Path $hklmInstallPath -Name "(Default)" -Value $pyDirPath -Force
-    Set-ItemProperty -Path $hklmInstallPath -Name "ExecutablePath" -Value $pyExePath -Force
-}
-
-# Run final checks
-# ---------------------------------------------------------------------------- #
-if (Get-Command py -ErrorAction SilentlyContinue) {  & py -3.9 --version }
-elseif ($pyExePath) { & $pyExePath --version }
+. uv python install -p 3.9
+### 
 
 # ---------------------------------------------------------------------------- #
 # ============================================================
