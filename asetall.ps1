@@ -23,9 +23,9 @@ if (Get-Command winget -ErrorAction SilentlyContinue) {
 }
 
 if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force -ErrorAction Continue
-Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
-$ErrorActionPreference = "Continue"
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force -ErrorAction Continue
+    Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression 
+    $ErrorActionPreference = "Continue"
 }
 
 # ============================================================
