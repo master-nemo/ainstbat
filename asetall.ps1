@@ -168,7 +168,9 @@ $env:UV_INSTALL_DIR='C:\dev\uv'; irm https://astral.sh/uv/install.ps1 | iex
 [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\dev\uv", [EnvironmentVariableTarget]::Machine)
 $env:Path += ";C:\dev\uv"
 
-uv python install 3.9
+uv python install 3.9 --default
+uv python update-shell
+
 ### 
 
 # ---------------------------------------------------------------------------- #
@@ -178,12 +180,14 @@ uv python install 3.9
 Write-Output "Package Deployment via Chocolatey"
 if (Get-Command choco -ErrorAction SilentlyContinue) {
     $apps1 = "googlechrome psmux 7zip.install gnuwin notepadplusplus fsviewer vlc conemu far doublecmd"
-    $apps2 = "clink nano micro git tortoisegit stduviewer clipdiary clawPDF"
+    $apps2 = "clink nano micro git tortoisegit stduviewer clawPDF"
     $apps3 = "k-litecodecpackbasic opera libreoffice-fresh adobereader sumatrapdf firefox choco-cleaner"
+    $apps4 = "clipdiary"
 
     choco install -y ($apps1 -split " ")
     choco install -y ($apps2 -split " ")
     choco install -y ($apps3 -split " ")
+    choco install -y ($apps4 -split " ")
 }
 
 # ============================================================
