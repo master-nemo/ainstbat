@@ -12,7 +12,7 @@ if (-not $isAdmin) {
 $ErrorActionPreference = "Continue"
 
 # ============================================================
-# [1/6] Chocolatey and Scoop Installation (Official Vendor Lines)
+# Chocolatey and Scoop Installation (Official Vendor Lines)
 # ============================================================
 if (Get-Command winget -ErrorAction SilentlyContinue) {
     winget install --id chocolatey.chocolatey --silent --accept-source-agreements --accept-package-agreements --disable-interactivity
@@ -28,39 +28,17 @@ Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
 $ErrorActionPreference = "Continue"
 
 # ============================================================
-# [2/6] Path Synchronization
+# Path Synchronization
 # ============================================================
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
 if ($env:Path -notlike "*chocolatey\bin*") { $env:Path += ";C:\ProgramData\chocolatey\bin" }
 if ($env:Path -notlike "*scoop\shims*") { $env:Path += ";$env:USERPROFILE\scoop\shims" }
 
-# ============================================================
-# [3/6] Package Deployment via Chocolatey
-# ============================================================
-Write-Output [3/6] Package Deployment via Chocolatey
-if (Get-Command choco -ErrorAction SilentlyContinue) {
-    $apps1 = "googlechrome psmux 7zip.install gnuwin notepadplusplus fsviewer vlc conemu far doublecmd"
-    $apps2 = "clink nano micro git tortoisegit stduviewer clipdiary clawPDF"
-    $apps3 = "k-litecodecpackbasic opera libreoffice-fresh adobereader sumatrapdf firefox choco-cleaner"
-
-    choco install -y ($apps1 -split " ")
-    choco install -y ($apps2 -split " ")
-    choco install -y ($apps3 -split " ")
-}
 
 # ============================================================
-# [4/6] Package Deployment via WinGet
+# Privacy Tweaks, OpenSSH and Registry Modifications
 # ============================================================
-Write-Output Package Deployment via WinGet
-if (Get-Command winget -ErrorAction SilentlyContinue) {
-    winget install --id marlocarlo.pstop --silent --accept-source-agreements --accept-package-agreements
-    winget install --id psmux.psnet --silent --accept-source-agreements --accept-package-agreements
-}
-
-# ============================================================
-# [5/6] Privacy Tweaks, OpenSSH and Registry Modifications
-# ============================================================
-Write-Output [5/6] Privacy Tweaks, OpenSSH and Registry Modifications
+Write-Output Privacy Tweaks, OpenSSH and Registry Modifications
 # Disable Python App Execution Aliases redirecting to MS Store
 Write-Output Disable Python App Execution Aliases redirecting to MS Store
 $aliasesPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Appx\AppExecutionAlias\SystemAlias\Microsoft.PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\python.exe"
@@ -124,9 +102,9 @@ Write-Output # Restart File Explorer to apply UI tweaks instantly
 Stop-Process -Name "explorer" -Force
 
 # ============================================================
-# [6/6] Install UV, Python 3.9 and Python Launcher
+# Install UV, Python 3.9 and Python Launcher
 # ============================================================
-Write-Output [6/6] Install UV, Python 3.9 and Python Launcher
+Write-Output Install UV, Python 3.9 and Python Launcher
 $uvDir = "C:\Program Files\uv"
 if (-not (Test-Path $uvDir)) { New-Item -ItemType Directory -Path $uvDir -Force | Out-Null }
 
@@ -179,6 +157,30 @@ if ($pyExePath) {
 # ---------------------------------------------------------------------------- #
 if (Get-Command py -ErrorAction SilentlyContinue) {  & py -3.9 --version }
 elseif ($pyExePath) { & $pyExePath --version }
+
+# ---------------------------------------------------------------------------- #
+# ============================================================
+# Package Deployment via Chocolatey
+# ============================================================
+Write-Output Package Deployment via Chocolatey
+if (Get-Command choco -ErrorAction SilentlyContinue) {
+    $apps1 = "googlechrome psmux 7zip.install gnuwin notepadplusplus fsviewer vlc conemu far doublecmd"
+    $apps2 = "clink nano micro git tortoisegit stduviewer clipdiary clawPDF"
+    $apps3 = "k-litecodecpackbasic opera libreoffice-fresh adobereader sumatrapdf firefox choco-cleaner"
+
+    choco install -y ($apps1 -split " ")
+    choco install -y ($apps2 -split " ")
+    choco install -y ($apps3 -split " ")
+}
+
+# ============================================================
+# Package Deployment via WinGet
+# ============================================================
+Write-Output Package Deployment via WinGet
+if (Get-Command winget -ErrorAction SilentlyContinue) {
+    winget install --id marlocarlo.pstop --silent --accept-source-agreements --accept-package-agreements
+    winget install --id psmux.psnet --silent --accept-source-agreements --accept-package-agreements
+}
 
 # ============================================================
 # OpenSSH Server Installation and Configuration
