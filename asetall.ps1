@@ -41,16 +41,16 @@ if ($env:Path -notlike "*scoop\shims*") { $env:Path += ";$env:USERPROFILE\scoop\
 # ============================================================
 # Privacy Tweaks, OpenSSH and Registry Modifications
 # ============================================================
-Write-Output Privacy Tweaks, OpenSSH and Registry Modifications
+Write-Output "Privacy Tweaks, OpenSSH and Registry Modifications"
 # Disable Python App Execution Aliases redirecting to MS Store
-Write-Output Disable Python App Execution Aliases redirecting to MS Store
+Write-Output "Disable Python App Execution Aliases redirecting to MS Store"
 $aliasesPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Appx\AppExecutionAlias\SystemAlias\Microsoft.PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\python.exe"
 $aliasesPath3 = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Appx\AppExecutionAlias\SystemAlias\Microsoft.PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\python3.exe"
 if (Test-Path $aliasesPath) {  Set-ItemProperty -Path $aliasesPath -Name "State" -Value 0 -Force }
 if (Test-Path $aliasesPath3) { Set-ItemProperty -Path $aliasesPath3 -Name "State" -Value 0 -Force }
 
 # System UI, Telemetry and Widgets optimization
-Write-Output System UI, Telemetry and Widgets optimization
+Write-Output "System UI, Telemetry and Widgets optimization"
 $regTweaks = @(
     @("HKCU:\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement", "ScoobeSystemSettingEnabled", 0, "DWord"),
     @("HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager", "SubscribedContent-310093Enabled", 0, "DWord"),
@@ -80,19 +80,19 @@ foreach ($tweak in $regTweaks) {
 }
 
 # Windows 11 Classic Context Menu
-Write-Output Windows 11 Classic Context Menu
+Write-Output "Windows 11 Classic Context Menu"
 $menuPath = "HKCU:\Software\Classes\CLSID\{5a2121c1-95a2-4599-9596-333f4c267061}\InprocServer32"
 if (-not (Test-Path $menuPath)) { New-Item -Path $menuPath -Force | Out-Null }
 Set-ItemProperty -Path $menuPath -Name "(Default)" -Value "" -Force
 
 # OneDrive Removal
-Write-Output # OneDrive Removal
+Write-Output "OneDrive Removal"
 Stop-Process -Name "OneDrive" -Force -ErrorAction SilentlyContinue
 if (Test-Path "$env:SystemRoot\System32\OneDriveSetup.exe") { Start-Process "$env:SystemRoot\System32\OneDriveSetup.exe" -ArgumentList "/uninstall" -Wait }
 if (Test-Path "$env:SystemRoot\SysWOW64\OneDriveSetup.exe") { Start-Process "$env:SystemRoot\SysWOW64\OneDriveSetup.exe" -ArgumentList "/uninstall" -Wait }
 
 # Native OpenSSH Server Feature Configuration
-Write-Output # Native OpenSSH Server Feature Configuration
+Write-Output "Native OpenSSH Server Feature Configuration"
 $sshService = Get-WindowsCapability -Online | Where-Object { $_.Name -like "OpenSSH.Server*" }
 if ($sshService.State -ne "Installed") { Add-WindowsCapability -Online -Name $sshService.Name | Out-Null }
 Set-Service -Name sshd -StartupType Automatic
@@ -102,13 +102,13 @@ else { New-NetFirewallRule -Name "OpenSSH-Server-In-TCP-Custom" -DisplayName "Op
 if ((Get-Service -Name sshd).Status -ne "Running") { Start-Service -Name sshd }
 
 # Restart File Explorer to apply UI tweaks instantly
-Write-Output # Restart File Explorer to apply UI tweaks instantly
+Write-Output "Restart File Explorer to apply UI tweaks instantly"
 Stop-Process -Name "explorer" -Force
 
 # ============================================================
 # Install UV, Python 3.9 and Python Launcher
 # ============================================================
-Write-Output Install UV, Python 3.9 and Python Launcher
+Write-Output "Install UV, Python 3.9 and Python Launcher"
 $uvDir = "C:\Program Files\uv"
 if (-not (Test-Path $uvDir)) { New-Item -ItemType Directory -Path $uvDir -Force | Out-Null }
 
@@ -166,7 +166,7 @@ elseif ($pyExePath) { & $pyExePath --version }
 # ============================================================
 # Package Deployment via Chocolatey
 # ============================================================
-Write-Output Package Deployment via Chocolatey
+Write-Output "Package Deployment via Chocolatey"
 if (Get-Command choco -ErrorAction SilentlyContinue) {
     $apps1 = "googlechrome psmux 7zip.install gnuwin notepadplusplus fsviewer vlc conemu far doublecmd"
     $apps2 = "clink nano micro git tortoisegit stduviewer clipdiary clawPDF"
@@ -180,7 +180,7 @@ if (Get-Command choco -ErrorAction SilentlyContinue) {
 # ============================================================
 # Package Deployment via WinGet
 # ============================================================
-Write-Output Package Deployment via WinGet
+Write-Output "Package Deployment via WinGet"
 if (Get-Command winget -ErrorAction SilentlyContinue) {
     winget install --id marlocarlo.pstop --silent --accept-source-agreements --accept-package-agreements
     winget install --id psmux.psnet --silent --accept-source-agreements --accept-package-agreements
