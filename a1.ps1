@@ -58,8 +58,8 @@ Set-Location "$targetDir\ainstbat-main"
 . .\asetall.ps1
 
 echo 111111
-# . "$PSScriptRoot\asetall.ps1"
-. "$PSScriptRoot\ainstbat-main\asetall.ps1"
+# # . "$PSScriptRoot\asetall.ps1"
+# . "$PSScriptRoot\ainstbat-main\asetall.ps1"
 echo 222222
 
 ## # for bat ver 
