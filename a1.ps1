@@ -5,6 +5,8 @@
 # Вызов: irm clck.ru/3VTVpT | iex
 # Вызов: irm goo.su/IL2OdTp | iex
 # ==============================================================================
+# from bat @chcp 65001 >nul & powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0setup.ps1"
+# ==============================================================================
 $ErrorActionPreference = "Stop"
 $zipUrl = "https://github.com/master-nemo/ainstbat/archive/refs/heads/main.zip" 
 
