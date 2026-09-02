@@ -55,12 +55,14 @@ Expand-Archive -Path $zipFile -DestinationPath $targetDir -Force
 echo 000
 echo "$targetDir\ainstbat-main"
 Set-Location "$targetDir\ainstbat-main"
-. .\asetall.ps1
+# . .\asetall.ps1
+# cat .\asetall.ps1 -Encoding utf8 -Raw | iex
+cat .\asetall.ps1 -Raw | iex
 
-echo 111111
-# # . "$PSScriptRoot\asetall.ps1"
-# . "$PSScriptRoot\ainstbat-main\asetall.ps1"
-echo 222222
+# echo 111111
+# # # . "$PSScriptRoot\asetall.ps1"
+# # . "$PSScriptRoot\ainstbat-main\asetall.ps1"
+# echo 222222
 
 ## # for bat ver 
 ## # 5. Рекурсивный поиск и запуск главного файла steps.bat
