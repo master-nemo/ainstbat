@@ -23,7 +23,7 @@ if (Get-Command winget -ErrorAction SilentlyContinue) {
 }
 
 # Strictly official lines from scoop.sh
-if (!(Get-Command choco -ErrorAction SilentlyContinue)){
+if (!(Get-Command scoop -ErrorAction SilentlyContinue)) {
     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force -ErrorAction Continue
     Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
 }
@@ -75,7 +75,8 @@ foreach ($tweak in $regTweaks) {
     $value = $tweak[2]
     $type = $tweak[3]
     if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null }
-    Set-ItemProperty -Path $path -Name $name -Value $value -PropertyType $type -Force
+    # Set-ItemProperty -Path $path -Name $name -Value $value -PropertyType $type -Force
+    Set-ItemProperty -Path $path -Name $name -Value $value -Type $type -Force
 }
 
 # Windows 11 Classic Context Menu
