@@ -53,7 +53,7 @@ Expand-Archive -Path $zipFile -DestinationPath $targetDir -Force
 # Примечание: сам файл _gist.zip НЕ удаляется, и остается в папке
 
 echo 000
-Set-Location ".\ainstbat-main"
+Set-Location "$targetDir\ainstbat-main"
 . asetall.ps1
 
 echo 111111
